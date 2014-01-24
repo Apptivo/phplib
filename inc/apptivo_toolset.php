@@ -6,6 +6,7 @@ class apptivo_toolset
 	public $access_key = 'null';
 	public $user_name = 'null';
 	public $ch;
+	public $custom_attributes = true;
 
 	function get_countries()
 	{
@@ -55,6 +56,7 @@ class apptivo_toolset
 		$lead_rank_id = '';  //I need to add comments with the three default values.  Let's set to "Normal" out of the box.
 		$customer_name = '';  //Need to run API method to get customer details before submitting this value
 		$customer_id = '';	//Need to run API method to get customer details before submitting this value
+		$assignee_name = '';
 		
 		$lead_status_id = 'I NEED TO GET THIS VALUE';
 		$lead_source_id = 'I NEED TO GET THIS VALUE';
@@ -86,18 +88,27 @@ class apptivo_toolset
 			$address_line = '}';
 		}
 		
+		if($this->custom_attributes == true)
+		{
+			$custom_attr = '&customAttributes=[{"id":"attribute_input_1390553045821_8872","customAttributeType":"input","customAttributeName":"attribute_input_1390553045821_8872","customAttributeValue":"dfsgsdfg"}]';
+		
+		}
+		
 		// Temporary hard-coded values
 		$lead_status_id = '6826705';
 		$lead_source_id = '13067790';
 		$assignee_id = '30389';
 		$lead_rank_id = '6826692';		
 	
-		$api_url = 'https://api.apptivo.com/app/dao/lead?a=createLead&leadData={"title":"'.$title.'","firstName":"'.$first_name.'","phone":"'.$phone.'","lastName":"'.$last_name.'","mobile":"'.$mobile.'","jobTitle":"'.$job_title.'","fax":"'.$fax.'","easyWayToContact":"'.$easy_way_to_contact.'","emailId":"'.$email.'","leadStatus":"'.$lead_status_id.'","leadSourceType":"'.$lead_source_id.'","refferedByName":"'.$referred_by_name.'","refferedById":"'.$referred_by_id.'","assigneeName":"'.$assignee_name.'","assignedToId":"'.$assignee_id.'","assigneeType":"'.$assignee_type.'","leadRank":"'.$lead_rank_id.'","accountName":"'.$customer_name.'","accountId":"'.$customer_id.'","description":"'.$description.'"'.$address_line.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key.'&userName='.$this->user_name;
+		$api_url = 'https://api.apptivo.com/app/dao/lead?a=createLead&leadData={"title":"'.$title.'","firstName":"'.$first_name.'","phone":"'.$phone.'","lastName":"'.$last_name.'","mobile":"'.$mobile.'","jobTitle":"'.$job_title.'","fax":"'.$fax.'","easyWayToContact":"'.$easy_way_to_contact.'","emailId":"'.$email.'","leadStatus":"'.$lead_status_id.'","leadSourceType":"'.$lead_source_id.'","refferedByName":"'.$referred_by_name.'","refferedById":"'.$referred_by_id.'","assigneeName":"'.$assignee_name.'","assignedToId":"'.$assignee_id.'","assigneeType":"'.$assignee_type.'","leadRank":"'.$lead_rank_id.'","accountName":"'.$customer_name.'","accountId":"'.$customer_id.'","description":"'.$description.'"'.$address_line.$custom_attr.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key.'&userName='.$this->user_name;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 
 		$dat_result = curl_exec($this->ch);
 		
 		$api_response = json_decode($dat_result);
+		
+		
+		print $api_url;
 		
 		if($api_response)
 		{
