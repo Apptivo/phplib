@@ -18,35 +18,38 @@ $apptivo = new apptivo_toolset($api_key, $access_key);
 //Only execute the api calls when data is being submitted.  Will either print a standard message, or return the response from API call.
 if(isset($_POST['lead_firstname']))
 {		
-	//info collected from the web form
-	$lead_firstname = $_POST['lead_firstname'];
-	$lead_lastname = $_POST['lead_lastname'];
-	$lead_description = $_POST['lead_description'];
-	$lead_email = $_POST['lead_email'];
-	$lead_company_name = $_POST['lead_company'];
-	$lead_job_title = $_POST['lead_job_title'];
-	
-	//Phone Fields 
-	$phone_arr = Array(
-		Array($_POST['phone_type_1'],$_POST['phone_number_1']),
-		Array($_POST['phone_type_2'],$_POST['phone_number_2'])
+	//Create array of common fields for this lead
+	$lead_data = Array (
+		'firstName' => urlencode($_POST['lead_firstname']),
+		'lastName' => urlencode($_POST['lead_lastname']),
+		'jobTitle' => urlencode($_POST['lead_job_title']),
+		'companyName' => urlencode($_POST['lead_company']),
+		'description' => urlencode($_POST['lead_description']),
+		'firstName' => urlencode($_POST['lead_firstname'])
 	);
+	
+	//Now we'll build Arrays for each type of grouped data: phone numbers, emails, addresses, and custom fields
+		//Phone Fields 
+		$phone_numbers = Array(
+			Array($_POST['phone_type_1'],$_POST['phone_number_1']),
+			Array($_POST['phone_type_2'],$_POST['phone_number_2'])
+		);
 
-	//Address Fields
-	$address_1 = $_POST['address_1'];
-	$address_2 = $_POST['address_2'];
-	$address_city = $_POST['address_city'];
-	$address_state = $_POST['address_state'];
-	$address_country = '176'; //Hard-coded to United States.  Possible to add a dropdown and allow selection of this.
-	$address_zip = $_POST['address_zip'];
+		//Address Fields
+		$address_1 = $_POST['address_1'];
+		$address_2 = $_POST['address_2'];
+		$address_city = $_POST['address_city'];
+		$address_state = $_POST['address_state'];
+		$address_country = '176'; //Hard-coded to United States.  Possible to add a dropdown and allow selection of this.
+		$address_zip = $_POST['address_zip'];
+		
+		//Custom Fields.  The attribute IDs need to be hard-coded.  Find attribute ID's by inspecting element inside of the Apptivo App.
+		$lead_isp = 'select,attr_11756_8834_select_6950d1d89a0a96715e5a350129e90346,'.$_POST['lead_isp'];
+		$lead_speed = 'input,attribute_input_1390553045821_8872,'.$_POST['lead_speed'];
+		$custom_attributes = Array($lead_isp, $lead_speed);
 	
-	//Custom Attribute Fields
-	$lead_isp = 'select,attr_11756_8834_select_6950d1d89a0a96715e5a350129e90346,'.$_POST['lead_isp'];
-	$lead_speed = 'input,attribute_input_1390553045821_8872,'.$_POST['lead_speed'];
-	
-	$custom_attributes = Array($lead_isp, $lead_speed);
-	
-	$form_message = $apptivo->create_lead($lead_firstname, $lead_lastname, $phone_arr, $lead_job_title, $lead_email, $lead_company_name, $assignee_id, $lead_description, $address_1, $address_2, $address_city, $address_state, $address_country, $address_zip, $custom_attributes);
+	//Finally, we call the common method to create a lead.  Returns a success/failure message
+	$form_message = $apptivo->create_lead($lead_data, $phone_numbers, $addresses, $emails, $custom_attributes);
 }else{
 	$form_message = 'Please complete the form below to proceed';
 }
