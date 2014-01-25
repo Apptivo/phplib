@@ -2,20 +2,18 @@
 /* ABOUT THIS FILE 
    This is a web to lead form that collects details from the user, and submits to the Apptivo REST API to generate a new sales lead.
    This form does not include any complex validation, use it as an example to build one on your website!
+   For details and the most recent code see here: https://github.com/Apptivo/phplib/wiki/Library-Documentation
 */
-
-// Include the apptivo_toolset class
-include(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'apptivo_toolset.php');
   
 // *****START CONFIGURATION*****
 	//Supply the user email you want to authenticate with, and the API & Access keys for the business
-	$user_name = 'admin@glocialtech.com';  //Replace this with your user account email address
 	$api_key = 'cb83cbc3-7efc-4457-9beb-a72871187cea'; // Replace this with your business api key
 	$access_key = 'grxPZSZKvEtB-eIArCNDnLNXl-0910a13e-651b-4e63-8175-86cb8f243b2a';  //Replace this with your business access key
 // *****END CONFIGURATION*****
 
 // Initialize the apptivo_toolset object
-$apptivo = new apptivo_toolset($api_key, $access_key, $user_name);
+include(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'apptivo_toolset.php');
+$apptivo = new apptivo_toolset($api_key, $access_key);
  
 //Only execute the api calls when data is being submitted.  Will either print a standard message, or return the response from API call.
 if(isset($_POST['lead_firstname']))
@@ -28,8 +26,11 @@ if(isset($_POST['lead_firstname']))
 	$lead_company_name = $_POST['lead_company'];
 	$lead_job_title = $_POST['lead_job_title'];
 	
-	//Phone Fields
-	$lead_phone = $_POST['lead_phone'];
+	//Phone Fields 
+	$phone_arr = Array(
+		Array($_POST['phone_type_1'],$_POST['phone_number_1']),
+		Array($_POST['phone_type_2'],$_POST['phone_number_2'])
+	);
 
 	//Address Fields
 	$address_1 = $_POST['address_1'];
@@ -45,7 +46,7 @@ if(isset($_POST['lead_firstname']))
 	
 	$custom_attributes = Array($lead_isp, $lead_speed);
 	
-	$form_message = $apptivo->create_lead($lead_firstname, $lead_lastname, $lead_phone, $lead_job_title, $lead_email, $lead_company_name, $assignee_id, $lead_description, $address_1, $address_2, $address_city, $address_state, $address_country, $address_zip, $custom_attributes);
+	$form_message = $apptivo->create_lead($lead_firstname, $lead_lastname, $phone_arr, $lead_job_title, $lead_email, $lead_company_name, $assignee_id, $lead_description, $address_1, $address_2, $address_city, $address_state, $address_country, $address_zip, $custom_attributes);
 }else{
 	$form_message = 'Please complete the form below to proceed';
 }
@@ -69,7 +70,9 @@ if(isset($_POST['lead_firstname']))
 					<label>Email: </label>
 					<input type="text" name="lead_email" /><br />
 					<label>Phone: </label>
-					<input type="text" name="lead_phone" /><br />
+					'.$apptivo->get_phone_type_dropdown_html('1').'<br />
+					<label>Alternate Phone: </label>
+					'.$apptivo->get_phone_type_dropdown_html('2').'<br />
 					<label>ISP: </label>
 					<select name="lead_isp" id="lead_isp">
 						<option name="Comcast">Comcast</option>

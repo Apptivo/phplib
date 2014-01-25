@@ -1,5 +1,8 @@
 <?php
-
+/* ABOUT THIS FILE 
+   This is a general class that contains methods commonly used when interacting with the Apptivo API.
+   For details and the most recent code see here: https://github.com/Apptivo/phplib/wiki/Library-Documentation
+*/
 class apptivo_toolset
 {
 	public $api_key = 'null';
@@ -7,48 +10,13 @@ class apptivo_toolset
 	public $user_name = 'null';
 	public $ch;
 	public $custom_attributes = true;
-
-	function get_countries()
-	{
-		$api_url = 'https://api.apptivo.com/app/commonservlet?a=getAllCountries&apiKey='.$this->api_key.'&accessKey='.$this->access_key.'&userName='.$this->user_name;
-		curl_setopt($this->ch, CURLOPT_URL, $api_url);
-
-		$dat_result = curl_exec($this->ch);
-		$api_response = json_decode($dat_result);
-
-		return $api_response;
-	}
 	
-	function get_states_by_country($input_country_id)
-	{
-		$api_url = 'https://api.apptivo.com/app/commonservlet?a=getAllStatesByCountryId&countryId='.$input_country_id.'&api_key='.$this->api_key.'&accessKey='.$this->access_key.'&userName='.$this->user_name;
-		curl_setopt($this->ch, CURLOPT_URL, $api_url);
-
-		$dat_result = curl_exec($this->ch);
-		$api_response = json_decode($dat_result);
-
-		return $api_response;
-	}
+// Primary Methods: Create Lead, Create Case, Create Customer, etc
 	
-	function get_state_dropdown_html($input_country_id)
-	{
-		$states = $this->get_states_by_country($input_country_id);
-		$output_html = '<select id="address_state" name="address_state">';
-		foreach ($states->responseObject as $cur_state)
-		{
-			$output_html .= '<option name="'.$cur_state->stateCode.','.$cur_state->stateName.'" value="'.$cur_state->stateCode.','.$cur_state->stateName.'">'.$cur_state->stateName.'</option>';	
-		}
-		$output_html .= '</select>';
-		
-		return $output_html;
-	}
-	
-	function create_lead($input_first_name, $input_last_name, $input_phone, $input_job_title, $input_email, $input_company_name, $input_assignee_id, $input_description, $input_address_1, $input_address_2, $input_address_city, $input_address_state, $input_address_country, $input_address_zip, $input_custom_attributes)
+	function create_lead($input_first_name, $input_last_name, $input_phone_numbers, $input_job_title, $input_email, $input_company_name, $input_assignee_id, $input_description, $input_address_1, $input_address_2, $input_address_city, $input_address_state, $input_address_country, $input_address_zip, $input_custom_attributes)
 	{
 		// Uncommon Assumed/Empty values, these could be abstracted and populated if desired
 		$title = 'Mr.';
-		$mobile = '';
-		$fax = '';
 		$easy_way_to_contact = 'EMAIL';
 		$way_to_contact = 'Email';
 		$referred_by_name = '';
@@ -98,21 +66,38 @@ class apptivo_toolset
 		// Sanitize the inputs, doing 1-by-1 in case we want to add individual processing later.  Could refactor this into a single data array to clean up.
 		$first_name = urlencode($input_first_name);
 		$last_name = urlencode($input_last_name);
-		$phone = urlencode($input_phone);
 		$job_title = urlencode($input_job_title);
 		$email = urlencode($input_email);
 		$company_name = urlencode($input_company_name);
 		$description = urlencode($input_description);
+		
+		//Phone Numbers
+		if(Count($input_phone_numbers > 0))
+		{
+			$first_val = true;
+			foreach($input_phone_numbers as $cur_phone)
+			{
+				$phone_type = explode(',', $cur_phone[0]);
+				if($first_val == true)
+				{
+					$add_comma = '';
+					$first_val = false;
+				}else{
+					$add_comma = ',';
+					$counter = $counter + 1;
+				}
+				$phone_numbers .= $add_comma.'{"phoneNumber":"'.$cur_phone[1].'","phoneTypeCode":"'.$phone_type[0].'","phoneType":"'.$phone_type[1].'","id":"lead_phone_input'.$counter.'"}';
+			}
+		}
+		
 		// Address fields
 		$address_1 = urlencode($input_address_1);
 		$address_2 = urlencode($input_address_2);
 		$address_city = urlencode($input_address_city);
-		//Address State is a comma seperated value with [State Name, State ID]
-		$state_arr = explode(',', $input_address_state);		
+		$address_zip = urlencode($input_address_zip);
+		$state_arr = explode(',', $input_address_state); //Address State is a comma separated value with [State Name, State ID]		
 		$address_state_id = $state_arr[0];
 		$address_state = $state_arr[1];
-		$address_zip = urlencode($input_address_zip);
-		
 		if(strlen($address_1) > 0 || strlen($address_state) > 0)
 		{			
 			$address_line = ',"addresses":[{"addressAttributeId":"address_section_attr_id","addressTypeCode":"1","addressType":"Billing+Address","addressLine1":"'.$address_1.'","addressLine2":"'.$address_2.'","city":"'.$address_city.'","stateCode":"'.$address_state_id.'","state":"'.$address_state.'","zipCode":"'.$address_zip.'","countryId":176,"countryName":"United+States"}]';
@@ -121,7 +106,6 @@ class apptivo_toolset
 		//Check to see if we passed in an array of custom attributes.  This array contains one or more attributes, and each attribute should have 3 values comma separated (attribute type, attribute id, attribute value)
 		if(strlen($input_custom_attributes > 0))
 		{
-			$custom_attr = ',"customAttributes":[';
 			$first_val = true;
 			foreach($input_custom_attributes as $cur_attr)
 			{
@@ -135,7 +119,6 @@ class apptivo_toolset
 				}
 				$custom_attr .= $add_comma.'{"customAttributeType":"'.$attr_arr[0].'","id":"'.$attr_arr[1].'","customAttributeName":"'.$attr_arr[1].'","customAttributeId":"'.$attr_arr[1].'","customAttributeValue":"'.urlencode($attr_arr[2]).'"}';
 			}
-			$custom_attr .= ']';
 		}
 		
 		// Temporary hard-coded values
@@ -151,14 +134,13 @@ class apptivo_toolset
 		$lead_rank_meaning = 'High';
 		$lead_type_id = -1;
 	
-		$api_url = 'https://api.apptivo.com/app/dao/leads?a=createLead&leadData={"title":"'.$title.'","firstName":"'.$first_name.'","lastName":"'.$last_name.'","jobTitle":"'.$job_title.'","easyWayToContact":"'.$easy_way_to_contact.'","wayToContact":"'.$way_to_contact.'","leadStatus":'.$lead_status_id.',"leadStatusMeaning":"'.$lead_status_meaning.'","leadSource":'.$lead_source_id.',"leadSourceMeaning":"'.$lead_source_meaning.'","leadTypeName":"'.$lead_type_name.'","leadTypeId":'.$lead_type_id.',"referredByName":"'.$referred_by_name.'","referredById":'.$referred_by_id.',"assigneeObjectRefName":"'.$assignee_name.'","assigneeObjectRefId":'.$assignee_id.',"assigneeObjectId":8,"description":"'.$description.'","skypeName":"'.$skype_name.'","potentialAmount":'.$potential_amount.',"currencyCode":"'.$currency_code.'","estimatedCloseDate":"'.$estimated_close_date.'","leadRank":'.$lead_rank_id.',"leadRankMeaning":"'.$lead_rank_meaning.'","campaignName":"'.$campaign_name.'","campaignId":'.$campaign_id.',"territoryName":"'.$territory_name.'","territoryId":'.$territory_id.',"marketId":'.$market_id.',"marketName":'.$market_name.',"segmentId":'.$segment_id.',"segmentName":'.$segment_name.',"followUpDate":'.$follow_up_date.',"followUpDescription":'.$follow_up_description.',"createdByName":"'.$created_by_name.'","lastUpdatedByName":"'.$last_updated_by_name.'","creationDate":"'.$creation_date.'","lastUpdateDate":"'.$last_update_date.'","accountName":"'.$account_name.'","accountId":'.$account_id.',"companyName":"'.$company_name.'","employeeRangeId":'.$employee_range_id.',"employeeRange":'.$employee_range.',"annualRevenue":'.$annual_revenue.',"industry":"'.$industry.'","industryName":"'.$industry_name.'","ownership":"'.$ownership.'","website":"'.$website.'","faceBookURL":"'.$facebook.'","twitterURL":"'.$twitter.'","linkedInURL":"'.$linkedin.'","phoneNumbers":[]'.$address_line.',"emailAddresses":[],"labels":[]'.$custom_attr.',"createdBy":null,"lastUpdatedBy":null}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/leads?a=createLead&leadData={"title":"'.$title.'","firstName":"'.$first_name.'","lastName":"'.$last_name.'","jobTitle":"'.$job_title.'","easyWayToContact":"'.$easy_way_to_contact.'","wayToContact":"'.$way_to_contact.'","leadStatus":'.$lead_status_id.',"leadStatusMeaning":"'.$lead_status_meaning.'","leadSource":'.$lead_source_id.',"leadSourceMeaning":"'.$lead_source_meaning.'","leadTypeName":"'.$lead_type_name.'","leadTypeId":'.$lead_type_id.',"referredByName":"'.$referred_by_name.'","referredById":'.$referred_by_id.',"assigneeObjectRefName":"'.$assignee_name.'","assigneeObjectRefId":'.$assignee_id.',"assigneeObjectId":8,"description":"'.$description.'","skypeName":"'.$skype_name.'","potentialAmount":'.$potential_amount.',"currencyCode":"'.$currency_code.'","estimatedCloseDate":"'.$estimated_close_date.'","leadRank":'.$lead_rank_id.',"leadRankMeaning":"'.$lead_rank_meaning.'","campaignName":"'.$campaign_name.'","campaignId":'.$campaign_id.',"territoryName":"'.$territory_name.'","territoryId":'.$territory_id.',"marketId":'.$market_id.',"marketName":'.$market_name.',"segmentId":'.$segment_id.',"segmentName":'.$segment_name.',"followUpDate":'.$follow_up_date.',"followUpDescription":'.$follow_up_description.',"createdByName":"'.$created_by_name.'","lastUpdatedByName":"'.$last_updated_by_name.'","creationDate":"'.$creation_date.'","lastUpdateDate":"'.$last_update_date.'","accountName":"'.$account_name.'","accountId":'.$account_id.',"companyName":"'.$company_name.'","employeeRangeId":'.$employee_range_id.',"employeeRange":'.$employee_range.',"annualRevenue":'.$annual_revenue.',"industry":"'.$industry.'","industryName":"'.$industry_name.'","ownership":"'.$ownership.'","website":"'.$website.'","faceBookURL":"'.$facebook.'","twitterURL":"'.$twitter.'","linkedInURL":"'.$linkedin.'","phoneNumbers":['.$phone_numbers.']'.$address_line.',"emailAddresses":[],"labels":[],"customAttributes":['.$custom_attr.'],"createdBy":null,"lastUpdatedBy":null}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
 		
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 
 		$dat_result = curl_exec($this->ch);
 		
 		$api_response = json_decode($dat_result);
-		
 		
 		print $api_url;
 		
@@ -171,11 +153,66 @@ class apptivo_toolset
 		
 	}
 
-	function __construct($input_apikey, $input_accesskey, $input_username) {
+// General data utility methods - get lists of countries/states, retrieve configuration settings, retrieve employee lists, etc.
+	
+		function get_countries()
+	{
+		$api_url = 'https://api.apptivo.com/app/commonservlet?a=getAllCountries&apiKey='.$this->api_key.'&accessKey='.$this->access_key.'&userName='.$this->user_name;
+		curl_setopt($this->ch, CURLOPT_URL, $api_url);
+
+		$dat_result = curl_exec($this->ch);
+		$api_response = json_decode($dat_result);
+
+		return $api_response;
+	}
+	
+	function get_states_by_country($input_country_id)
+	{
+		$api_url = 'https://api.apptivo.com/app/commonservlet?a=getAllStatesByCountryId&countryId='.$input_country_id.'&api_key='.$this->api_key.'&accessKey='.$this->access_key.'&userName='.$this->user_name;
+		curl_setopt($this->ch, CURLOPT_URL, $api_url);
+
+		$dat_result = curl_exec($this->ch);
+		$api_response = json_decode($dat_result);
+
+		return $api_response;
+	}
+	
+//HTML Utilities.  Methods to generate commonly used HTML snippets for web forms.  Things like state dropdowns, phone number types, etc
+	
+	function get_state_dropdown_html($input_country_id)
+	{
+		$states = $this->get_states_by_country($input_country_id);
+		$output_html = '<select id="address_state" name="address_state">';
+		foreach ($states->responseObject as $cur_state)
+		{
+			$output_html .= '<option value="'.$cur_state->stateCode.','.$cur_state->stateName.'">'.$cur_state->stateName.'</option>';	
+		}
+		$output_html .= '</select>';
+		
+		return $output_html;
+	}
+	
+	function get_phone_type_dropdown_html($field_number='1')
+	{
+		$output_html = '
+			<select name="phone_type_'.$field_number.'" id="phone_type_'.$field_number.'">
+				<option value="PHONE_BUSINESS,Business">Business</option>
+				<option value="PHONE_MOBILE,Mobile">Mobile</option>
+				<option value="PHONE_HOME,Home">Home</option>
+				<option value="PHONE_FAX,Fax">Fax</option>
+				<option value="PHONE_Other,Other">Other</option>
+			</select>	
+			<input type="text" name="phone_number_'.$field_number.'" id="phone_number_'.$field_number.'" />
+		';
+		return $output_html;
+	}
+	
+//Constructor sets the api/access keypair.  Also constructs the curl object so we can start making API requests.  Will destroy curl object on destruct.
+
+	function __construct($input_apikey, $input_accesskey) {
 				
 		$this->api_key = $input_apikey;
 		$this->access_key = $input_accesskey;
-		$this->user_name = $input_username;
 		
 		// Basic curl implementation.  This can be further secured in future.
 		$this->ch = curl_init();
