@@ -13,7 +13,6 @@ class apptivo_toolset
 	
 // Primary Methods: Create Lead, Create Case, Create Customer, etc
 	
-	//function create_lead($input_first_name, $input_last_name, $input_phone_numbers, $input_job_title, $input_email, $input_company_name, $input_assignee_id, $input_description, $input_address_1, $input_address_2, $input_address_city, $input_address_state, $input_address_country, $input_address_zip, $input_custom_attributes)
 	function create_lead($input_lead_data, $input_phone_numbers, $input_addresses, $input_emails, $input_custom_attributes)
 	{
 		// Uncommon Assumed/Empty values, these could be abstracted and populated if desired
@@ -74,50 +73,73 @@ class apptivo_toolset
 		//Phone Numbers
 		if(Count($input_phone_numbers > 0))
 		{
-			$first_val = true;
+			$counter = 1;
 			foreach($input_phone_numbers as $cur_phone)
 			{
-				$phone_type = explode(',', $cur_phone[0]);
-				if($first_val == true)
+				if($counter == 1)
 				{
 					$add_comma = '';
-					$first_val = false;
+					$counter_text = ''; //Don't change the ID for the first number, or else we get a blank field.
 				}else{
 					$add_comma = ',';
-					$counter = $counter + 1;
+					$counter_text = $counter;
 				}
-				$phone_numbers .= $add_comma.'{"phoneNumber":"'.$cur_phone[1].'","phoneTypeCode":"'.$phone_type[0].'","phoneType":"'.$phone_type[1].'","id":"lead_phone_input'.$counter.'"}';
+				$phone_numbers .= $add_comma.'{"phoneNumber":"'.$cur_phone['phoneNumber'].'","phoneTypeCode":"'.$cur_phone['phoneType'].'","phoneType":"'.$cur_phone['phoneType'].'","id":"lead_phone_input'.$counter_text.'"}';
+				$counter = $counter + 1;
+			}
+		}
+		
+		//Email Addresses
+		if(Count($input_emails > 0))
+		{
+			$counter = 1;
+			foreach($input_emails as $cur_email)
+			{
+				if($counter == 1)
+				{
+					$add_comma = '';
+					$counter_text = ''; //Don't change the ID for the first number, or else we get a blank field.
+				}else{
+					$add_comma = ',';
+					$counter_text = $counter;
+				}
+				$emails .= $add_comma.'{"emailAddress":"'.$cur_email['emailAddress'].'","emailType":"'.$cur_email['emailType'].'","emailTypeCode":"'.$cur_email['emailType'].'","id":"cont_email_input'.$counter_text.'"}';
+				$counter = $counter + 1;
 			}
 		}
 		
 		// Address fields
-		$address_1 = urlencode($input_address_1);
-		$address_2 = urlencode($input_address_2);
-		$address_city = urlencode($input_address_city);
-		$address_zip = urlencode($input_address_zip);
-		$state_arr = explode(',', $input_address_state); //Address State is a comma separated value with [State Name, State ID]		
-		$address_state_id = $state_arr[0];
-		$address_state = $state_arr[1];
-		if(strlen($address_1) > 0 || strlen($address_state) > 0)
-		{			
-			$address_line = ',"addresses":[{"addressAttributeId":"address_section_attr_id","addressTypeCode":"1","addressType":"Billing+Address","addressLine1":"'.$address_1.'","addressLine2":"'.$address_2.'","city":"'.$address_city.'","stateCode":"'.$address_state_id.'","state":"'.$address_state.'","zipCode":"'.$address_zip.'","countryId":176,"countryName":"United+States"}]';
-		}
-		
-		//Check to see if we passed in an array of custom attributes.  This array contains one or more attributes, and each attribute should have 3 values comma separated (attribute type, attribute id, attribute value)
-		if(strlen($input_custom_attributes > 0))
+		if(Count($input_addresses > 0))
 		{
-			$first_val = true;
-			foreach($input_custom_attributes as $cur_attr)
+			$counter = 1;
+			foreach($input_addresses as $cur_addr)
 			{
-				$attr_arr = explode(',', $cur_attr);
-				if($first_val == true)
+				$phone_type = explode(',', $cur_addr[0]);
+				if($counter == 1)
 				{
 					$add_comma = '';
-					$first_val = false;
 				}else{
 					$add_comma = ',';
 				}
-				$custom_attr .= $add_comma.'{"customAttributeType":"'.$attr_arr[0].'","id":"'.$attr_arr[1].'","customAttributeName":"'.$attr_arr[1].'","customAttributeId":"'.$attr_arr[1].'","customAttributeValue":"'.urlencode($attr_arr[2]).'"}';
+				$addresses .= $add_comma.'{"addressAttributeId":"address_section_attr_id'.$counter.'","addressTypeCode":"'.$cur_addr['addressTypeCode'].'","addressType":"'.$cur_addr['addressType'].'","addressLine1":"'.$cur_addr['addressLine1'].'","addressLine2":"'.$cur_addr['addressLine2'].'","city":"'.$cur_addr['city'].'","stateCode":"'.$cur_addr['stateCode'].'","state":"'.$cur_addr['state'].'","zipCode":"'.$cur_addr['zipCode'].'","countryId":'.$cur_addr['countryId'].',"countryName":"'.$cur_addr['countryName'].'"}';
+				$counter = $counter + 1;
+			}
+		}
+		
+		//Check to see if we passed in an array of custom attributes.  This array contains one or more attributes, and each attribute should have 3 values comma separated (attribute type, attribute id, attribute value)
+		if(Count($input_custom_attributes > 0))
+		{
+			$counter = 1;
+			foreach($input_custom_attributes as $cur_attr)
+			{
+				if($counter == 1)
+				{
+					$add_comma = '';
+				}else{
+					$add_comma = ',';
+				}
+				$custom_attr .= $add_comma.'{"customAttributeType":"'.$cur_attr['customAttributeType'].'","id":"'.$cur_attr['id'].'","customAttributeName":"'.$cur_attr['id'].'","customAttributeId":"'.$cur_attr['id'].'","customAttributeValue":"'.$cur_attr['customAttributeValue'].'"}';
+				$counter = $counter + 1;
 			}
 		}
 		
@@ -134,7 +156,7 @@ class apptivo_toolset
 		$lead_rank_meaning = 'High';
 		$lead_type_id = -1;
 	
-		$api_url = 'https://api.apptivo.com/app/dao/leads?a=createLead&leadData={"title":"'.$title.'","firstName":"'.$input_lead_data['firstName'].'","lastName":"'.$input_lead_data['lastName'].'","jobTitle":"'.$jobTitle.'","easyWayToContact":"'.$easy_way_to_contact.'","wayToContact":"'.$way_to_contact.'","leadStatus":'.$lead_status_id.',"leadStatusMeaning":"'.$lead_status_meaning.'","leadSource":'.$lead_source_id.',"leadSourceMeaning":"'.$lead_source_meaning.'","leadTypeName":"'.$lead_type_name.'","leadTypeId":'.$lead_type_id.',"referredByName":"'.$referred_by_name.'","referredById":'.$referred_by_id.',"assigneeObjectRefName":"'.$assignee_name.'","assigneeObjectRefId":'.$assignee_id.',"assigneeObjectId":8,"description":"'.$input_lead_data['description'].'","skypeName":"'.$skype_name.'","potentialAmount":'.$potential_amount.',"currencyCode":"'.$currency_code.'","estimatedCloseDate":"'.$estimated_close_date.'","leadRank":'.$lead_rank_id.',"leadRankMeaning":"'.$lead_rank_meaning.'","campaignName":"'.$campaign_name.'","campaignId":'.$campaign_id.',"territoryName":"'.$territory_name.'","territoryId":'.$territory_id.',"marketId":'.$market_id.',"marketName":'.$market_name.',"segmentId":'.$segment_id.',"segmentName":'.$segment_name.',"followUpDate":'.$follow_up_date.',"followUpDescription":'.$follow_up_description.',"createdByName":"'.$created_by_name.'","lastUpdatedByName":"'.$last_updated_by_name.'","creationDate":"'.$creation_date.'","lastUpdateDate":"'.$last_update_date.'","accountName":"'.$account_name.'","accountId":'.$account_id.',"companyName":"'.$input_lead_data['companyName'].'","employeeRangeId":'.$employee_range_id.',"employeeRange":'.$employee_range.',"annualRevenue":'.$annual_revenue.',"industry":"'.$industry.'","industryName":"'.$industry_name.'","ownership":"'.$ownership.'","website":"'.$website.'","faceBookURL":"'.$facebook.'","twitterURL":"'.$twitter.'","linkedInURL":"'.$linkedin.'","phoneNumbers":['.$phone_numbers.']'.$address_line.',"emailAddresses":[],"labels":[],"customAttributes":['.$custom_attr.'],"createdBy":null,"lastUpdatedBy":null}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/leads?a=createLead&leadData={"title":"'.$title.'","firstName":"'.$input_lead_data['firstName'].'","lastName":"'.$input_lead_data['lastName'].'","jobTitle":"'.$jobTitle.'","easyWayToContact":"'.$easy_way_to_contact.'","wayToContact":"'.$way_to_contact.'","leadStatus":'.$lead_status_id.',"leadStatusMeaning":"'.$lead_status_meaning.'","leadSource":'.$lead_source_id.',"leadSourceMeaning":"'.$lead_source_meaning.'","leadTypeName":"'.$lead_type_name.'","leadTypeId":'.$lead_type_id.',"referredByName":"'.$referred_by_name.'","referredById":'.$referred_by_id.',"assigneeObjectRefName":"'.$assignee_name.'","assigneeObjectRefId":'.$assignee_id.',"assigneeObjectId":8,"description":"'.$input_lead_data['description'].'","skypeName":"'.$skype_name.'","potentialAmount":'.$potential_amount.',"currencyCode":"'.$currency_code.'","estimatedCloseDate":"'.$estimated_close_date.'","leadRank":'.$lead_rank_id.',"leadRankMeaning":"'.$lead_rank_meaning.'","campaignName":"'.$campaign_name.'","campaignId":'.$campaign_id.',"territoryName":"'.$territory_name.'","territoryId":'.$territory_id.',"marketId":'.$market_id.',"marketName":'.$market_name.',"segmentId":'.$segment_id.',"segmentName":'.$segment_name.',"followUpDate":'.$follow_up_date.',"followUpDescription":'.$follow_up_description.',"createdByName":"'.$created_by_name.'","lastUpdatedByName":"'.$last_updated_by_name.'","creationDate":"'.$creation_date.'","lastUpdateDate":"'.$last_update_date.'","accountName":"'.$account_name.'","accountId":'.$account_id.',"companyName":"'.$input_lead_data['companyName'].'","employeeRangeId":'.$employee_range_id.',"employeeRange":'.$employee_range.',"annualRevenue":'.$annual_revenue.',"industry":"'.$industry.'","industryName":"'.$industry_name.'","ownership":"'.$ownership.'","website":"'.$website.'","faceBookURL":"'.$facebook.'","twitterURL":"'.$twitter.'","linkedInURL":"'.$linkedin.'","phoneNumbers":['.$phone_numbers.'],"addresses":['.$addresses.'],"emailAddresses":['.$emails.'],"labels":[],"customAttributes":['.$custom_attr.'],"createdBy":null,"lastUpdatedBy":null}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
 		
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 
@@ -191,16 +213,29 @@ class apptivo_toolset
 		
 		return $output_html;
 	}
+		
+	function get_email_type_dropdown_html($field_number='1')
+	{
+		$output_html = '
+			<select name="email_type_'.$field_number.'" id="email_type_'.$field_number.'">
+				<option value="Business">Business</option>
+				<option value="Home">Home</option>
+				<option value="Other">Other</option>
+			</select>	
+			<input type="text" name="email_address_'.$field_number.'" id="email_address_'.$field_number.'" />
+		';
+		return $output_html;
+	}
 	
 	function get_phone_type_dropdown_html($field_number='1')
 	{
 		$output_html = '
 			<select name="phone_type_'.$field_number.'" id="phone_type_'.$field_number.'">
-				<option value="PHONE_BUSINESS,Business">Business</option>
-				<option value="PHONE_MOBILE,Mobile">Mobile</option>
-				<option value="PHONE_HOME,Home">Home</option>
-				<option value="PHONE_FAX,Fax">Fax</option>
-				<option value="PHONE_Other,Other">Other</option>
+				<option value="Business">Business</option>
+				<option value="Mobile">Mobile</option>
+				<option value="Home">Home</option>
+				<option value="PFax">Fax</option>
+				<option value="Other">Other</option>
 			</select>	
 			<input type="text" name="phone_number_'.$field_number.'" id="phone_number_'.$field_number.'" />
 		';

@@ -6,7 +6,7 @@
 */
   
 // *****START CONFIGURATION*****
-	//Supply the user email you want to authenticate with, and the API & Access keys for the business
+	//Supply the API & Access keys for your Apptivo account
 	$api_key = 'cb83cbc3-7efc-4457-9beb-a72871187cea'; // Replace this with your business api key
 	$access_key = 'grxPZSZKvEtB-eIArCNDnLNXl-0910a13e-651b-4e63-8175-86cb8f243b2a';  //Replace this with your business access key
 // *****END CONFIGURATION*****
@@ -31,24 +31,70 @@ if(isset($_POST['lead_firstname']))
 	//Now we'll build Arrays for each type of grouped data: phone numbers, emails, addresses, and custom fields
 		//Phone Fields 
 		$phone_numbers = Array(
-			Array($_POST['phone_type_1'],$_POST['phone_number_1']),
-			Array($_POST['phone_type_2'],$_POST['phone_number_2'])
+			Array(
+				'phoneType' => $_POST['phone_type_1'],
+				'phoneNumber' => $_POST['phone_number_1']
+			),
+			Array(
+				'phoneType' => $_POST['phone_type_2'],
+				'phoneNumber' => $_POST['phone_number_2']
+			)
 		);
-
+		//Email Fields 		
+		$emails = Array(
+			Array(
+				'emailType' => $_POST['email_type_1'],
+				'emailAddress' => $_POST['email_address_1']
+			),
+			Array(
+				'emailType' => $_POST['email_type_2'],
+				'emailAddress' => $_POST['email_address_2']
+			)
+		);
 		//Address Fields
-		$address_1 = $_POST['address_1'];
-		$address_2 = $_POST['address_2'];
-		$address_city = $_POST['address_city'];
-		$address_state = $_POST['address_state'];
-		$address_country = '176'; //Hard-coded to United States.  Possible to add a dropdown and allow selection of this.
-		$address_zip = $_POST['address_zip'];
-		
+		$state_arr = explode(',', $_POST['address_state']); //Address State is a comma separated value with [State ID, State Name]		
+		$addresses = Array (
+			Array (
+				'addressTypeCode' => 1,
+				'addressType' => urlencode('Billing Address'),
+				'addressLine1' => urlencode($_POST['address_1']),
+				'addressLine2' => urlencode($_POST['address_2']),
+				'city' => urlencode($_POST['address_city']),
+				'stateCode' => $state_arr[0],
+				'state' => urlencode($state_arr[1]),
+				'zipCode' => $_POST['address_zip'],
+				'countryId' => 176,
+				'countryName' => urlencode('United States')
+			),
+			//Hard-coding to shipping address as well, for an example of multi-address usage
+			Array (
+				'addressTypeCode' => 1,
+				'addressType' => urlencode('Shipping Address'),
+				'addressLine1' => urlencode($_POST['address_1']),
+				'addressLine2' => urlencode($_POST['address_2']),
+				'city' => urlencode($_POST['address_city']),
+				'stateCode' => $state_arr[0],
+				'state' => urlencode($state_arr[1]),
+				'zipCode' => $_POST['address_zip'],
+				'countryId' => 176,
+				'countryName' => urlencode('United States')
+			)
+		);
 		//Custom Fields.  The attribute IDs need to be hard-coded.  Find attribute ID's by inspecting element inside of the Apptivo App.
-		$lead_isp = 'select,attr_11756_8834_select_6950d1d89a0a96715e5a350129e90346,'.$_POST['lead_isp'];
-		$lead_speed = 'input,attribute_input_1390553045821_8872,'.$_POST['lead_speed'];
-		$custom_attributes = Array($lead_isp, $lead_speed);
+		$custom_attributes = Array(
+			Array (
+				'customAttributeType' => 'select',
+				'id' => 'attr_11756_8834_select_6950d1d89a0a96715e5a350129e90346',
+				'customAttributeValue' => $_POST['lead_isp']
+			),
+			Array (
+				'customAttributeType' => 'input',
+				'id' => 'attribute_input_1390553045821_8872',
+				'customAttributeValue' => $_POST['lead_speed']
+			)
+		);
 	
-	//Finally, we call the common method to create a lead.  Returns a success/failure message
+	//Finally, we call the method to create a lead.  Returns a success/failure message
 	$form_message = $apptivo->create_lead($lead_data, $phone_numbers, $addresses, $emails, $custom_attributes);
 }else{
 	$form_message = 'Please complete the form below to proceed';
@@ -71,7 +117,9 @@ if(isset($_POST['lead_firstname']))
 					<label>Job Title: </label>
 					<input type="text" name="lead_job_title" /><br />
 					<label>Email: </label>
-					<input type="text" name="lead_email" /><br />
+					'.$apptivo->get_email_type_dropdown_html('1').'<br />
+					<label>Alternate Email: </label>
+					'.$apptivo->get_email_type_dropdown_html('2').'<br />
 					<label>Phone: </label>
 					'.$apptivo->get_phone_type_dropdown_html('1').'<br />
 					<label>Alternate Phone: </label>
