@@ -43,24 +43,56 @@ class apptivo_toolset
 		return $output_html;
 	}
 	
-	function create_lead($input_first_name, $input_last_name, $input_phone, $input_job_title, $input_email, $input_company_name, $input_assignee_id, $input_description, $input_address_1, $input_address_2, $input_address_city, $input_address_state, $input_address_country, $input_address_zip)
+	function create_lead($input_first_name, $input_last_name, $input_phone, $input_job_title, $input_email, $input_company_name, $input_assignee_id, $input_description, $input_address_1, $input_address_2, $input_address_city, $input_address_state, $input_address_country, $input_address_zip, $input_custom_attributes)
 	{
 		// Uncommon Assumed/Empty values, these could be abstracted and populated if desired
 		$title = 'Mr.';
 		$mobile = '';
 		$fax = '';
 		$easy_way_to_contact = 'EMAIL';
+		$way_to_contact = 'Email';
 		$referred_by_name = '';
 		$referred_by_id = '';
-		$country_id = '176';
+		$country_id = '176';  //Hard-coded to USA for now
 		$lead_rank_id = '';  //I need to add comments with the three default values.  Let's set to "Normal" out of the box.
-		$customer_name = '';  //Need to run API method to get customer details before submitting this value
-		$customer_id = '';	//Need to run API method to get customer details before submitting this value
-		$assignee_name = '';
+		$lead_type_id = '';
+		$lead_type_name = '';
+		$skype_name = '';
+		$potential_amount = 'null';
+		$currency_code = 'USD';
+		$estimated_close_date = '';
+		$campaign_name = '';
+		$campaign_id = 'null';
+		$territory_id = 'null';
+		$territory_name = '';
+		$market_id = 'null';
+		$market_name = 'null';
+		$segment_id = 'null';
+		$segment_name = 'null';
+		$follow_up_date = 'null';
+		$follow_up_description = 'null';
+		$last_updated_by_name = '';
+		$created_by_name = '';
+		$last_update_date = '';
+		$creation_date = '';
+		$account_name = '';
+		$account_id = 'null';
+		$employee_range_id = 'null';
+		$employee_range = 'null';
+		$annual_revenue = 'null';
+		$industry = '';
+		$industry_name = '';
+		$ownership = '';
+		$website = '';
+		$facebook = '';
+		$twitter = '';
+		$linkedin = '';
+		
 		
 		$lead_status_id = 'I NEED TO GET THIS VALUE';
 		$lead_source_id = 'I NEED TO GET THIS VALUE';
 		$assignee_id = 'NEED TO GET THIS';
+		$assignee_name = 'NEED TO GET THIS';
 		$assignee_type = 'Employee'; //This value must be changed if we are assigning to a team
 		
 		// Sanitize the inputs, doing 1-by-1 in case we want to add individual processing later.  Could refactor this into a single data array to clean up.
@@ -83,24 +115,44 @@ class apptivo_toolset
 		
 		if(strlen($address_1) > 0 || strlen($address_state) > 0)
 		{			
-			$address_line = ',"address_country":"'.$country_id.'"}&addressData1=["-1","'.$country_id.'","'.$address_1.'","'.$address_2.'","'.$address_city.'","'.$address_state.'","'.$address_state_id.'","'.$address_zip.'","'.$country_id.'"]';
-		}else{
-			$address_line = '}';
+			$address_line = ',"addresses":[{"addressAttributeId":"address_section_attr_id","addressTypeCode":"1","addressType":"Billing+Address","addressLine1":"'.$address_1.'","addressLine2":"'.$address_2.'","city":"'.$address_city.'","stateCode":"'.$address_state_id.'","state":"'.$address_state.'","zipCode":"'.$address_zip.'","countryId":176,"countryName":"United+States"}]';
 		}
 		
-		if($this->custom_attributes == true)
+		//Check to see if we passed in an array of custom attributes.  This array contains one or more attributes, and each attribute should have 3 values comma separated (attribute type, attribute id, attribute value)
+		if(strlen($input_custom_attributes > 0))
 		{
-			$custom_attr = '&customAttributes=[{"id":"attribute_input_1390553045821_8872","customAttributeType":"input","customAttributeName":"attribute_input_1390553045821_8872","customAttributeValue":"dfsgsdfg"}]';
-		
+			$custom_attr = ',"customAttributes":[';
+			$first_val = true;
+			foreach($input_custom_attributes as $cur_attr)
+			{
+				$attr_arr = explode(',', $cur_attr);
+				if($first_val == true)
+				{
+					$add_comma = '';
+					$first_val = false;
+				}else{
+					$add_comma = ',';
+				}
+				$custom_attr .= $add_comma.'{"customAttributeType":"'.$attr_arr[0].'","id":"'.$attr_arr[1].'","customAttributeName":"'.$attr_arr[1].'","customAttributeId":"'.$attr_arr[1].'","customAttributeValue":"'.urlencode($attr_arr[2]).'"}';
+			}
+			$custom_attr .= ']';
 		}
 		
 		// Temporary hard-coded values
 		$lead_status_id = '6826705';
-		$lead_source_id = '13067790';
-		$assignee_id = '30389';
-		$lead_rank_id = '6826692';		
+		$lead_status_meaning = 'New';
+		$lead_source_id = '6827230';
+		$lead_source_meaning = 'Other';
+		$assignee_id = '18767';
+		$assignee_name = urlencode('Kenny Clark');
+		$referred_by_id = '18767';
+		$referred_by_name = urlencode('Kenny Clark');
+		$lead_rank_id = '6826692';	
+		$lead_rank_meaning = 'High';
+		$lead_type_id = -1;
 	
-		$api_url = 'https://api.apptivo.com/app/dao/lead?a=createLead&leadData={"title":"'.$title.'","firstName":"'.$first_name.'","phone":"'.$phone.'","lastName":"'.$last_name.'","mobile":"'.$mobile.'","jobTitle":"'.$job_title.'","fax":"'.$fax.'","easyWayToContact":"'.$easy_way_to_contact.'","emailId":"'.$email.'","leadStatus":"'.$lead_status_id.'","leadSourceType":"'.$lead_source_id.'","refferedByName":"'.$referred_by_name.'","refferedById":"'.$referred_by_id.'","assigneeName":"'.$assignee_name.'","assignedToId":"'.$assignee_id.'","assigneeType":"'.$assignee_type.'","leadRank":"'.$lead_rank_id.'","accountName":"'.$customer_name.'","accountId":"'.$customer_id.'","description":"'.$description.'"'.$address_line.$custom_attr.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key.'&userName='.$this->user_name;
+		$api_url = 'https://api.apptivo.com/app/dao/leads?a=createLead&leadData={"title":"'.$title.'","firstName":"'.$first_name.'","lastName":"'.$last_name.'","jobTitle":"'.$job_title.'","easyWayToContact":"'.$easy_way_to_contact.'","wayToContact":"'.$way_to_contact.'","leadStatus":'.$lead_status_id.',"leadStatusMeaning":"'.$lead_status_meaning.'","leadSource":'.$lead_source_id.',"leadSourceMeaning":"'.$lead_source_meaning.'","leadTypeName":"'.$lead_type_name.'","leadTypeId":'.$lead_type_id.',"referredByName":"'.$referred_by_name.'","referredById":'.$referred_by_id.',"assigneeObjectRefName":"'.$assignee_name.'","assigneeObjectRefId":'.$assignee_id.',"assigneeObjectId":8,"description":"'.$description.'","skypeName":"'.$skype_name.'","potentialAmount":'.$potential_amount.',"currencyCode":"'.$currency_code.'","estimatedCloseDate":"'.$estimated_close_date.'","leadRank":'.$lead_rank_id.',"leadRankMeaning":"'.$lead_rank_meaning.'","campaignName":"'.$campaign_name.'","campaignId":'.$campaign_id.',"territoryName":"'.$territory_name.'","territoryId":'.$territory_id.',"marketId":'.$market_id.',"marketName":'.$market_name.',"segmentId":'.$segment_id.',"segmentName":'.$segment_name.',"followUpDate":'.$follow_up_date.',"followUpDescription":'.$follow_up_description.',"createdByName":"'.$created_by_name.'","lastUpdatedByName":"'.$last_updated_by_name.'","creationDate":"'.$creation_date.'","lastUpdateDate":"'.$last_update_date.'","accountName":"'.$account_name.'","accountId":'.$account_id.',"companyName":"'.$company_name.'","employeeRangeId":'.$employee_range_id.',"employeeRange":'.$employee_range.',"annualRevenue":'.$annual_revenue.',"industry":"'.$industry.'","industryName":"'.$industry_name.'","ownership":"'.$ownership.'","website":"'.$website.'","faceBookURL":"'.$facebook.'","twitterURL":"'.$twitter.'","linkedInURL":"'.$linkedin.'","phoneNumbers":[]'.$address_line.',"emailAddresses":[],"labels":[]'.$custom_attr.',"createdBy":null,"lastUpdatedBy":null}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 
 		$dat_result = curl_exec($this->ch);

@@ -26,6 +26,10 @@ if(isset($_POST['lead_firstname']))
 	$lead_description = $_POST['lead_description'];
 	$lead_email = $_POST['lead_email'];
 	$lead_company_name = $_POST['lead_company'];
+	$lead_job_title = $_POST['lead_job_title'];
+	
+	//Phone Fields
+	$lead_phone = $_POST['lead_phone'];
 
 	//Address Fields
 	$address_1 = $_POST['address_1'];
@@ -33,9 +37,15 @@ if(isset($_POST['lead_firstname']))
 	$address_city = $_POST['address_city'];
 	$address_state = $_POST['address_state'];
 	$address_country = '176'; //Hard-coded to United States.  Possible to add a dropdown and allow selection of this.
-	$address_zip = $POST['address_zip'];
+	$address_zip = $_POST['address_zip'];
 	
-	$form_message = $apptivo->create_lead($lead_firstname, $lead_lastname, $input_phone, $input_job_title, $lead_email, $lead_company_name, $assignee_id, $lead_description, $address_1, $address_2, $address_city, $address_state, $address_country, $address_zip);
+	//Custom Attribute Fields
+	$lead_isp = 'select,attr_11756_8834_select_6950d1d89a0a96715e5a350129e90346,'.$_POST['lead_isp'];
+	$lead_speed = 'input,attribute_input_1390553045821_8872,'.$_POST['lead_speed'];
+	
+	$custom_attributes = Array($lead_isp, $lead_speed);
+	
+	$form_message = $apptivo->create_lead($lead_firstname, $lead_lastname, $lead_phone, $lead_job_title, $lead_email, $lead_company_name, $assignee_id, $lead_description, $address_1, $address_2, $address_city, $address_state, $address_country, $address_zip, $custom_attributes);
 }else{
 	$form_message = 'Please complete the form below to proceed';
 }
@@ -54,8 +64,22 @@ if(isset($_POST['lead_firstname']))
 					<input type="text" name="lead_lastname" /><br />
 					<label>Company: </label>
 					<input type="text" name="lead_company" /><br />
+					<label>Job Title: </label>
+					<input type="text" name="lead_job_title" /><br />
 					<label>Email: </label>
 					<input type="text" name="lead_email" /><br />
+					<label>Phone: </label>
+					<input type="text" name="lead_phone" /><br />
+					<label>ISP: </label>
+					<select name="lead_isp" id="lead_isp">
+						<option name="Comcast">Comcast</option>
+						<option name="AT&T">AT&T</option>
+						<option name="Fios">Fios</option>
+						<option name="Google Fiber">Google Fiber</option>
+						<option name="Time Warner">Time Warner</option>
+					</select><br />
+					<label>Internet Speed: </label>
+					<input type="text" name="lead_speed" /><br />
 					<label>Comments: </label>
 					<textarea name="lead_description"></textarea><br />
 					<label>Address 1: </label>
