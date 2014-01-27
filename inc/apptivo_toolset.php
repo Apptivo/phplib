@@ -13,63 +13,8 @@ class apptivo_toolset
 	
 // Primary Methods: Create Lead, Create Case, Create Customer, etc
 	
-	function create_lead($input_lead_data, $input_phone_numbers, $input_addresses, $input_emails, $input_custom_attributes)
+	function create_lead($lead_data, $input_phone_numbers, $input_addresses, $input_emails, $input_custom_attributes)
 	{
-		// Uncommon Assumed/Empty values, these could be abstracted and populated if desired
-		$title = 'Mr.';
-		$easy_way_to_contact = 'EMAIL';
-		$way_to_contact = 'Email';
-		$referred_by_name = '';
-		$referred_by_id = '';
-		$country_id = '176';  //Hard-coded to USA for now
-		$lead_rank_id = '';  //I need to add comments with the three default values.  Let's set to "Normal" out of the box.
-		$lead_type_id = '';
-		$lead_type_name = '';
-		$skype_name = '';
-		$potential_amount = 'null';
-		$currency_code = 'USD';
-		$estimated_close_date = '';
-		$campaign_name = '';
-		$campaign_id = 'null';
-		$territory_id = 'null';
-		$territory_name = '';
-		$market_id = 'null';
-		$market_name = 'null';
-		$segment_id = 'null';
-		$segment_name = 'null';
-		$follow_up_date = 'null';
-		$follow_up_description = 'null';
-		$last_updated_by_name = '';
-		$created_by_name = '';
-		$last_update_date = '';
-		$creation_date = '';
-		$account_name = '';
-		$account_id = 'null';
-		$employee_range_id = 'null';
-		$employee_range = 'null';
-		$annual_revenue = 'null';
-		$industry = '';
-		$industry_name = '';
-		$ownership = '';
-		$website = '';
-		$facebook = '';
-		$twitter = '';
-		$linkedin = '';
-		
-		
-		$lead_status_id = 'I NEED TO GET THIS VALUE';
-		$lead_source_id = 'I NEED TO GET THIS VALUE';
-		$assignee_id = 'NEED TO GET THIS';
-		$assignee_name = 'NEED TO GET THIS';
-		$assignee_type = 'Employee'; //This value must be changed if we are assigning to a team
-		
-		// Sanitize the inputs, doing 1-by-1 in case we want to add individual processing later.  Could refactor this into a single data array to clean up.
-		$firstName = urlencode($firstName);
-		$last_name = urlencode($input_last_name);
-		$job_title = urlencode($input_job_title);
-		$companyName = urlencode($input_company_name);
-		$description = urlencode($description);
-		
 		//Phone Numbers
 		if(Count($input_phone_numbers > 0))
 		{
@@ -143,20 +88,75 @@ class apptivo_toolset
 			}
 		}
 		
-		// Temporary hard-coded values
-		$lead_status_id = '6826705';
-		$lead_status_meaning = 'New';
-		$lead_source_id = '6827230';
-		$lead_source_meaning = 'Other';
-		$assignee_id = '18767';
-		$assignee_name = urlencode('Kenny Clark');
-		$referred_by_id = '18767';
-		$referred_by_name = urlencode('Kenny Clark');
-		$lead_rank_id = '6826692';	
-		$lead_rank_meaning = 'High';
-		$lead_type_id = -1;
+		// Some attributes require a value.  But are not commonly used.  We'll check if a value as given, if not set to a default
+		if(!$lead_data['title']){$lead_data['title'] = 'Mr.';}
+		if(!$lead_data['easyWayToContact']){$lead_data['easyWayToContact'] = 'EMAIL';}
+		if(!$lead_data['wayToContact']){$lead_data['wayToContact'] = 'Email';}
+		if(!$lead_data['currencyCode']){$lead_data['currencyCode'] = 'USD';}
+		if(!$lead_data['leadTypeId']){$lead_data['leadTypeId'] = -1;}
+		
+		// Some attributes need to have "null" passed in, if there is no value.  We'll check if a value was given, if not set to null.
+		if(!$lead_data['potentialAmount']){$lead_data['potentialAmount'] = 'null';}
+		if(!$lead_data['campaignId']){$lead_data['campaignId'] = 'null';}
+		if(!$lead_data['territoryId']){$lead_data['territoryId'] = 'null';}
+		if(!$lead_data['marketId']){$lead_data['marketId'] = 'null';}
+		if(!$lead_data['marketName']){$lead_data['marketName'] = 'null';}
+		if(!$lead_data['segment_id']){$lead_data['segment_id'] = 'null';}
+		if(!$lead_data['segmentName']){$lead_data['segmentName'] = 'null';}
+		if(!$lead_data['followUpDate']){$lead_data['followUpDate'] = 'null';}
+		if(!$lead_data['followUpDescription']){$lead_data['followUpDescription'] = 'null';}
+		if(!$lead_data['accountId']){$lead_data['accountId'] = 'null';}
+		if(!$lead_data['employeeRangeId']){$lead_data['employeeRangeId'] = 'null';}
+		if(!$lead_data['employeeRange']){$lead_data['employeeRange'] = 'null';}
+		if(!$lead_data['annualRevenue']){$lead_data['annualRevenue'] = 'null';}
+		if(!$lead_data['potentialAmount']){$lead_data['potentialAmount'] = 'null';}
+		if(!$lead_data['potentialAmount']){$lead_data['potentialAmount'] = 'null';}
+		if(!$lead_data['potentialAmount']){$lead_data['potentialAmount'] = 'null';}
+		if(!$lead_data['potentialAmount']){$lead_data['potentialAmount'] = 'null';}
+		
+		/* These are other possible values that could be passed in
+			$lead_data['referredByName']
+			$lead_data['referredById']
+			$lead_data['leadTypeId']
+			$lead_data['leadTypeName']
+			$lead_data['skypeName']
+			$lead_data['estimatedCloseDate']
+			$lead_data['campaignName']
+			$lead_data['territoryName']
+			$lead_data['lastUpdatedByName']
+			$lead_data['createdByName']
+			$lead_data['lastUpdateDate']
+			$lead_data['creationDate']
+			$lead_data['accountName']
+			$lead_data['industry']
+			$lead_data['industryName']
+			$lead_data['ownership']
+			$lead_data['website']
+			$lead_data['faceBookURL']
+			$lead_data['twitterURL']
+			$lead_data['linkedInURL']
+		*/
+		
+		/* WORK TO BE COMPLETED - Need to abstract all of these values */
+			$lead_rank_id = '';  //I need to add comments with the three default values.  Let's set to "Normal" out of the box.
+			$lead_status_id = 'I NEED TO GET THIS VALUE';
+			$lead_source_id = 'I NEED TO GET THIS VALUE';
+			$assignee_id = 'NEED TO GET THIS';
+			$assignee_name = 'NEED TO GET THIS';
+			$assignee_type = 'Employee'; //This value must be changed if we are assigning to a team
+			$lead_data['leadStatus'] = '6826705';
+			$lead_data['leadStatusMeaning'] = 'New';
+			$lead_data['leadSource'] = '6827230';
+			$lead_data['leadSourceMeaning'] = 'Other';
+			$lead_data['assigneeObjectRefId'] = '18767';
+			$lead_data['assigneeObjectRefName'] = urlencode('Kenny Clark');
+			$lead_data['referredById'] = '18767';
+			$lead_data['referredByName'] = urlencode('Kenny Clark');
+			$lead_data['leadRank'] = '6826692';	
+			$lead_data['leadRankMeaning'] = 'High';
+		/* END WORK TO BE COMPLETED */
 	
-		$api_url = 'https://api.apptivo.com/app/dao/leads?a=createLead&leadData={"title":"'.$title.'","firstName":"'.$input_lead_data['firstName'].'","lastName":"'.$input_lead_data['lastName'].'","jobTitle":"'.$jobTitle.'","easyWayToContact":"'.$easy_way_to_contact.'","wayToContact":"'.$way_to_contact.'","leadStatus":'.$lead_status_id.',"leadStatusMeaning":"'.$lead_status_meaning.'","leadSource":'.$lead_source_id.',"leadSourceMeaning":"'.$lead_source_meaning.'","leadTypeName":"'.$lead_type_name.'","leadTypeId":'.$lead_type_id.',"referredByName":"'.$referred_by_name.'","referredById":'.$referred_by_id.',"assigneeObjectRefName":"'.$assignee_name.'","assigneeObjectRefId":'.$assignee_id.',"assigneeObjectId":8,"description":"'.$input_lead_data['description'].'","skypeName":"'.$skype_name.'","potentialAmount":'.$potential_amount.',"currencyCode":"'.$currency_code.'","estimatedCloseDate":"'.$estimated_close_date.'","leadRank":'.$lead_rank_id.',"leadRankMeaning":"'.$lead_rank_meaning.'","campaignName":"'.$campaign_name.'","campaignId":'.$campaign_id.',"territoryName":"'.$territory_name.'","territoryId":'.$territory_id.',"marketId":'.$market_id.',"marketName":'.$market_name.',"segmentId":'.$segment_id.',"segmentName":'.$segment_name.',"followUpDate":'.$follow_up_date.',"followUpDescription":'.$follow_up_description.',"createdByName":"'.$created_by_name.'","lastUpdatedByName":"'.$last_updated_by_name.'","creationDate":"'.$creation_date.'","lastUpdateDate":"'.$last_update_date.'","accountName":"'.$account_name.'","accountId":'.$account_id.',"companyName":"'.$input_lead_data['companyName'].'","employeeRangeId":'.$employee_range_id.',"employeeRange":'.$employee_range.',"annualRevenue":'.$annual_revenue.',"industry":"'.$industry.'","industryName":"'.$industry_name.'","ownership":"'.$ownership.'","website":"'.$website.'","faceBookURL":"'.$facebook.'","twitterURL":"'.$twitter.'","linkedInURL":"'.$linkedin.'","phoneNumbers":['.$phone_numbers.'],"addresses":['.$addresses.'],"emailAddresses":['.$emails.'],"labels":[],"customAttributes":['.$custom_attr.'],"createdBy":null,"lastUpdatedBy":null}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/leads?a=createLead&leadData={"title":"'.$lead_data['title'].'","firstName":"'.$lead_data['firstName'].'","lastName":"'.$lead_data['lastName'].'","jobTitle":"'.$lead_data['jobTitle'].'","easyWayToContact":"'.$lead_data['easyWayToContact'].'","wayToContact":"'.$lead_data['wayToContact'].'","leadStatus":'.$lead_data['leadStatus'].',"leadStatusMeaning":"'.$lead_data['leadStatusMeaning'].'","leadSource":'.$lead_data['leadSource'].',"leadSourceMeaning":"'.$lead_data['leadSourceMeaning'].'","leadTypeName":"'.$lead_data['leadTypeName'].'","leadTypeId":'.$lead_data['leadTypeId'].',"referredByName":"'.$lead_data['referredByName'].'","referredById":'.$lead_data['referredById'].',"assigneeObjectRefName":"'.$lead_data['assigneeObjectRefName'].'","assigneeObjectRefId":'.$lead_data['assigneeObjectRefId'].',"assigneeObjectId":8,"description":"'.$lead_data['description'].'","skypeName":"'.$lead_data['skypeName'].'","potentialAmount":'.$lead_data['potentialAmount'].',"currencyCode":"'.$lead_data['currencyCode'].'","estimatedCloseDate":"'.$lead_data['estimatedCloseDate'].'","leadRank":'.$lead_data['leadRank'].',"leadRankMeaning":"'.$lead_data['leadRankMeaning'].'","campaignName":"'.$lead_data['campaignName'].'","campaignId":'.$lead_data['campaignId'].',"territoryName":"'.$lead_data['territoryName'].'","territoryId":'.$lead_data['territoryId'].',"marketId":'.$lead_data['marketId'].',"marketName":'.$lead_data['marketName'].',"segmentId":'.$lead_data['segment_id'].',"segmentName":'.$lead_data['segmentName'].',"followUpDate":'.$lead_data['followUpDate'].',"followUpDescription":'.$lead_data['followUpDescription'].',"createdByName":"'.$lead_data['createdByName'].'","lastUpdatedByName":"'.$lead_data['lastUpdatedByName'].'","creationDate":"'.$lead_data['creationDate'].'","lastUpdateDate":"'.$lead_data['lastUpdateDate'].'","accountName":"'.$lead_data['accountName'].'","accountId":'.$lead_data['accountId'].',"companyName":"'.$lead_data['companyName'].'","employeeRangeId":'.$lead_data['employeeRangeId'].',"employeeRange":'.$lead_data['employeeRange'].',"annualRevenue":'.$lead_data['annualRevenue'].',"industry":"'.$lead_data['industry'].'","industryName":"'.$lead_data['industryName'].'","ownership":"'.$lead_data['ownership'].'","website":"'.$lead_data['website'].'","faceBookURL":"'.$lead_data['faceBookURL'].'","twitterURL":"'.$lead_data['twitterURL'].'","linkedInURL":"'.$lead_data['linkedInURL'].'","phoneNumbers":['.$phone_numbers.'],"addresses":['.$addresses.'],"emailAddresses":['.$emails.'],"labels":[],"customAttributes":['.$custom_attr.'],"createdBy":null,"lastUpdatedBy":null}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
 		
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 

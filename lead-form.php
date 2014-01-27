@@ -29,6 +29,7 @@ if(isset($_POST['lead_firstname']))
 	);
 	
 	//Now we'll build Arrays for each type of grouped data: phone numbers, emails, addresses, and custom fields
+	
 		//Phone Fields 
 		$phone_numbers = Array(
 			Array(
@@ -40,6 +41,7 @@ if(isset($_POST['lead_firstname']))
 				'phoneNumber' => $_POST['phone_number_2']
 			)
 		);
+		
 		//Email Fields 		
 		$emails = Array(
 			Array(
@@ -51,6 +53,7 @@ if(isset($_POST['lead_firstname']))
 				'emailAddress' => $_POST['email_address_2']
 			)
 		);
+		
 		//Address Fields
 		$state_arr = explode(',', $_POST['address_state']); //Address State is a comma separated value with [State ID, State Name]		
 		$addresses = Array (
@@ -80,6 +83,7 @@ if(isset($_POST['lead_firstname']))
 				'countryName' => urlencode('United States')
 			)
 		);
+		
 		//Custom Fields.  The attribute IDs need to be hard-coded.  Find attribute ID's by inspecting element inside of the Apptivo App.
 		$custom_attributes = Array(
 			Array (
