@@ -88,6 +88,22 @@ class apptivo_toolset
 			}
 		}
 		
+		// These are mandatory fields that we cannot set a default for.  You must pass in these fields, or we'll return an error message.
+		$required_fields = Array('assigneeObjectRefId','assigneeObjectRefName','referredById','referredByName','leadStatus','leadStatusMeaning','leadSource','leadSourceMeaning','leadRank','leadRankMeaning');
+		foreach ($required_fields as $cur_field)
+		{
+			if(!$lead_data[$cur_field])
+			{
+				$form_message .= 'Error: '.$cur_field.' is empty.  This is a required field.  Please report this error to the website admin.<br />';
+			}
+		}
+		
+		// If we missed any required fields, $form_message will contain the errors.  Check for value and just return the message & exit if one is found.
+		if($form_message)
+		{
+			return $form_message;
+		}
+		
 		// Some attributes require a value.  But are not commonly used.  We'll check if a value as given, if not set to a default
 		if(!$lead_data['title']){$lead_data['title'] = 'Mr.';}
 		if(!$lead_data['easyWayToContact']){$lead_data['easyWayToContact'] = 'EMAIL';}
@@ -109,9 +125,6 @@ class apptivo_toolset
 		if(!$lead_data['employeeRangeId']){$lead_data['employeeRangeId'] = 'null';}
 		if(!$lead_data['employeeRange']){$lead_data['employeeRange'] = 'null';}
 		if(!$lead_data['annualRevenue']){$lead_data['annualRevenue'] = 'null';}
-		if(!$lead_data['potentialAmount']){$lead_data['potentialAmount'] = 'null';}
-		if(!$lead_data['potentialAmount']){$lead_data['potentialAmount'] = 'null';}
-		if(!$lead_data['potentialAmount']){$lead_data['potentialAmount'] = 'null';}
 		if(!$lead_data['potentialAmount']){$lead_data['potentialAmount'] = 'null';}
 		
 		/* These are other possible values that could be passed in
@@ -136,26 +149,7 @@ class apptivo_toolset
 			$lead_data['twitterURL']
 			$lead_data['linkedInURL']
 		*/
-		
-		/* WORK TO BE COMPLETED - Need to abstract all of these values */
-			$lead_rank_id = '';  //I need to add comments with the three default values.  Let's set to "Normal" out of the box.
-			$lead_status_id = 'I NEED TO GET THIS VALUE';
-			$lead_source_id = 'I NEED TO GET THIS VALUE';
-			$assignee_id = 'NEED TO GET THIS';
-			$assignee_name = 'NEED TO GET THIS';
-			$assignee_type = 'Employee'; //This value must be changed if we are assigning to a team
-			$lead_data['leadStatus'] = '6826705';
-			$lead_data['leadStatusMeaning'] = 'New';
-			$lead_data['leadSource'] = '6827230';
-			$lead_data['leadSourceMeaning'] = 'Other';
-			$lead_data['assigneeObjectRefId'] = '18767';
-			$lead_data['assigneeObjectRefName'] = urlencode('Kenny Clark');
-			$lead_data['referredById'] = '18767';
-			$lead_data['referredByName'] = urlencode('Kenny Clark');
-			$lead_data['leadRank'] = '6826692';	
-			$lead_data['leadRankMeaning'] = 'High';
-		/* END WORK TO BE COMPLETED */
-	
+			
 		$api_url = 'https://api.apptivo.com/app/dao/leads?a=createLead&leadData={"title":"'.$lead_data['title'].'","firstName":"'.$lead_data['firstName'].'","lastName":"'.$lead_data['lastName'].'","jobTitle":"'.$lead_data['jobTitle'].'","easyWayToContact":"'.$lead_data['easyWayToContact'].'","wayToContact":"'.$lead_data['wayToContact'].'","leadStatus":'.$lead_data['leadStatus'].',"leadStatusMeaning":"'.$lead_data['leadStatusMeaning'].'","leadSource":'.$lead_data['leadSource'].',"leadSourceMeaning":"'.$lead_data['leadSourceMeaning'].'","leadTypeName":"'.$lead_data['leadTypeName'].'","leadTypeId":'.$lead_data['leadTypeId'].',"referredByName":"'.$lead_data['referredByName'].'","referredById":'.$lead_data['referredById'].',"assigneeObjectRefName":"'.$lead_data['assigneeObjectRefName'].'","assigneeObjectRefId":'.$lead_data['assigneeObjectRefId'].',"assigneeObjectId":8,"description":"'.$lead_data['description'].'","skypeName":"'.$lead_data['skypeName'].'","potentialAmount":'.$lead_data['potentialAmount'].',"currencyCode":"'.$lead_data['currencyCode'].'","estimatedCloseDate":"'.$lead_data['estimatedCloseDate'].'","leadRank":'.$lead_data['leadRank'].',"leadRankMeaning":"'.$lead_data['leadRankMeaning'].'","campaignName":"'.$lead_data['campaignName'].'","campaignId":'.$lead_data['campaignId'].',"territoryName":"'.$lead_data['territoryName'].'","territoryId":'.$lead_data['territoryId'].',"marketId":'.$lead_data['marketId'].',"marketName":'.$lead_data['marketName'].',"segmentId":'.$lead_data['segment_id'].',"segmentName":'.$lead_data['segmentName'].',"followUpDate":'.$lead_data['followUpDate'].',"followUpDescription":'.$lead_data['followUpDescription'].',"createdByName":"'.$lead_data['createdByName'].'","lastUpdatedByName":"'.$lead_data['lastUpdatedByName'].'","creationDate":"'.$lead_data['creationDate'].'","lastUpdateDate":"'.$lead_data['lastUpdateDate'].'","accountName":"'.$lead_data['accountName'].'","accountId":'.$lead_data['accountId'].',"companyName":"'.$lead_data['companyName'].'","employeeRangeId":'.$lead_data['employeeRangeId'].',"employeeRange":'.$lead_data['employeeRange'].',"annualRevenue":'.$lead_data['annualRevenue'].',"industry":"'.$lead_data['industry'].'","industryName":"'.$lead_data['industryName'].'","ownership":"'.$lead_data['ownership'].'","website":"'.$lead_data['website'].'","faceBookURL":"'.$lead_data['faceBookURL'].'","twitterURL":"'.$lead_data['twitterURL'].'","linkedInURL":"'.$lead_data['linkedInURL'].'","phoneNumbers":['.$phone_numbers.'],"addresses":['.$addresses.'],"emailAddresses":['.$emails.'],"labels":[],"customAttributes":['.$custom_attr.'],"createdBy":null,"lastUpdatedBy":null}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
 		
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);

@@ -28,6 +28,19 @@ if(isset($_POST['lead_firstname']))
 		'firstName' => urlencode($_POST['lead_firstname'])
 	);
 	
+	//These are some mandatory values that won't come from the web form.  You can hard-code this, or apply some logic.  An example would be to change the assignee of a lead, based on the address submitted in the form, so you can distribute leads based on region.
+	$lead_data['assigneeObjectRefId'] = '18767';
+	$lead_data['assigneeObjectRefName'] = urlencode('Kenny Clark');
+	$lead_data['referredById'] = '18767';
+	$lead_data['referredByName'] = urlencode('Kenny Clark');
+	$lead_data['leadStatus'] = '6826705';
+	$lead_data['leadStatusMeaning'] = 'New';
+	$lead_data['leadSource'] = '6827230';
+	$lead_data['leadSourceMeaning'] = 'Other';
+	$lead_data['leadRank'] = '6826692';	
+	$lead_data['leadRankMeaning'] = 'High';
+	
+	
 	//Now we'll build Arrays for each type of grouped data: phone numbers, emails, addresses, and custom fields
 	
 		//Phone Fields 
