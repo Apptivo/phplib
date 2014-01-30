@@ -16,16 +16,15 @@ include(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 
 $apptivo = new apptivo_toolset($api_key, $access_key);
  
 //Only execute the api calls when data is being submitted.  Will either print a standard message, or return the response from API call.
-if(isset($_POST['lead_firstname']))
+if(isset($_POST['lastName']))
 {		
 	//Create array of common fields for this lead
 	$lead_data = Array (
-		'firstName' => urlencode($_POST['lead_firstname']),
-		'lastName' => urlencode($_POST['lead_lastname']),
-		'jobTitle' => urlencode($_POST['lead_job_title']),
-		'companyName' => urlencode($_POST['lead_company']),
-		'description' => urlencode($_POST['lead_description']),
-		'firstName' => urlencode($_POST['lead_firstname'])
+		'firstName' => urlencode($_POST['firstName']),
+		'lastName' => urlencode($_POST['lastName']),
+		'jobTitle' => urlencode($_POST['jobTitle']),
+		'companyName' => urlencode($_POST['companyName']),
+		'description' => urlencode($_POST['description']),
 	);
 	
 	//These are some mandatory values that won't come from the web form.  You can hard-code this, or apply some logic.  An example would be to change the assignee of a lead, based on the address submitted in the form, so you can distribute leads based on region.
@@ -116,7 +115,6 @@ if(isset($_POST['lead_firstname']))
 }else{
 	$form_message = 'Please complete the form below to proceed';
 }
-
 ?>
 <html>
 	<body>
@@ -126,13 +124,13 @@ if(isset($_POST['lead_firstname']))
 				<div class="form_message">'.$form_message.'</div>
 				<form class="apptivo_form" action="'.$_SERVER['REQUEST_URI'].'" method="post" name="form">
 					<label>First Name: </label>
-					<input type="text" name="lead_firstname" /><br />
+					<input type="text" name="firstName" /><br />
 					<label>Last Name: </label>
-					<input type="text" name="lead_lastname" /><br />
+					<input type="text" name="lastName" /><br />
 					<label>Company: </label>
-					<input type="text" name="lead_company" /><br />
+					<input type="text" name="companyName" /><br />
 					<label>Job Title: </label>
-					<input type="text" name="lead_job_title" /><br />
+					<input type="text" name="jobTitle" /><br />
 					<label>Email: </label>
 					'.$apptivo->get_email_type_dropdown_html('1').'<br />
 					<label>Alternate Email: </label>
@@ -152,7 +150,7 @@ if(isset($_POST['lead_firstname']))
 					<label>Internet Speed: </label>
 					<input type="text" name="lead_speed" /><br />
 					<label>Comments: </label>
-					<textarea name="lead_description"></textarea><br />
+					<textarea name="description"></textarea><br />
 					<label>Address 1: </label>
 					<input type="text" name="address_1" /><br />
 					<label>Address 2: </label>
