@@ -27,7 +27,9 @@ if(isset($_POST['lastName']))
 		'description' => urlencode($_POST['description']),
 	);
 	
-	//These are some mandatory values that won't come from the web form.  You can hard-code this, or apply some logic.  An example would be to change the assignee of a lead, based on the address submitted in the form, so you can distribute leads based on region.
+	//These are some mandatory values that won't come from the web form.  You can hard-code this, or apply some logic.
+	// An example would be to change the assignee of a lead, based on the address submitted in the form, so you can distribute leads based on region.
+	// Click this link to learn how to locate these IDs using your Apptivo account: https://github.com/Apptivo/phplib/wiki/Locating-ID-Numbers-&-Other-Data
 	$lead_data['assigneeObjectRefId'] = '18767';
 	$lead_data['assigneeObjectRefName'] = urlencode('Kenny Clark');
 	$lead_data['referredById'] = '18767';
@@ -96,17 +98,17 @@ if(isset($_POST['lastName']))
 			)
 		);
 		
-		//Custom Fields.  The attribute IDs need to be hard-coded.  Find attribute ID's by inspecting element inside of the Apptivo App.
+		//Custom Fields.  The attribute IDs need to be hard-coded.  Learn how to find these values here: https://github.com/Apptivo/phplib/wiki/Locating-ID-Numbers-&-Other-Data
 		$custom_attributes = Array(
 			Array (
 				'customAttributeType' => 'select',
 				'id' => 'attr_11756_8834_select_6950d1d89a0a96715e5a350129e90346',
-				'customAttributeValue' => $_POST['lead_isp']
+				'customAttributeValue' => $_POST['lead_isp'] // This is the value passed in from the web form
 			),
 			Array (
 				'customAttributeType' => 'input',
 				'id' => 'attribute_input_1390553045821_8872',
-				'customAttributeValue' => $_POST['lead_speed']
+				'customAttributeValue' => $_POST['lead_speed'] // This is the value passed in from the web form
 			)
 		);
 	
