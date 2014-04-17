@@ -7,9 +7,14 @@ class apptivo_toolset
 {
 	public $api_key = 'null';
 	public $access_key = 'null';
-	public $user_name = 'null';
 	public $ch;
-	public $custom_attributes = true;
+	
+	public $caseType;
+	public $caseTypeId;
+	public $caseStatus;
+	public $caseStatusId;
+	public $casePriority;
+	public $casePriorityId;
 	
 // Primary Methods: Create Lead, Create Case, Create Customer, etc
 	
@@ -154,9 +159,9 @@ class apptivo_toolset
 		
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 
-		$dat_result = curl_exec($this->ch);
+		$api_result = curl_exec($this->ch);
 		
-		$api_response = json_decode($dat_result);
+		$api_response = json_decode($api_result);
 		
 		print $api_url;
 		
@@ -169,64 +174,8 @@ class apptivo_toolset
 		
 	}
 	
-	function create_case($case_data, $input_phone_numbers, $input_addresses, $input_emails, $input_custom_attributes)
+	function create_case($case_data, $input_custom_attributes)
 	{
-		//Phone Numbers
-		if(Count($input_phone_numbers > 0))
-		{
-			$counter = 1;
-			foreach($input_phone_numbers as $cur_phone)
-			{
-				if($counter == 1)
-				{
-					$add_comma = '';
-					$counter_text = ''; //Don't change the ID for the first number, or else we get a blank field.
-				}else{
-					$add_comma = ',';
-					$counter_text = $counter;
-				}
-				$phone_numbers .= $add_comma.'{"phoneNumber":"'.$cur_phone['phoneNumber'].'","phoneTypeCode":"'.$cur_phone['phoneType'].'","phoneType":"'.$cur_phone['phoneType'].'","id":"case_phone_input'.$counter_text.'"}';
-				$counter = $counter + 1;
-			}
-		}
-		
-		//Email Addresses
-		if(Count($input_emails > 0))
-		{
-			$counter = 1;
-			foreach($input_emails as $cur_email)
-			{
-				if($counter == 1)
-				{
-					$add_comma = '';
-					$counter_text = ''; //Don't change the ID for the first number, or else we get a blank field.
-				}else{
-					$add_comma = ',';
-					$counter_text = $counter;
-				}
-				$emails .= $add_comma.'{"emailAddress":"'.$cur_email['emailAddress'].'","emailType":"'.$cur_email['emailType'].'","emailTypeCode":"'.$cur_email['emailType'].'","id":"cont_email_input'.$counter_text.'"}';
-				$counter = $counter + 1;
-			}
-		}
-		
-		// Address fields
-		if(Count($input_addresses > 0))
-		{
-			$counter = 1;
-			foreach($input_addresses as $cur_addr)
-			{
-				$phone_type = explode(',', $cur_addr[0]);
-				if($counter == 1)
-				{
-					$add_comma = '';
-				}else{
-					$add_comma = ',';
-				}
-				$addresses .= $add_comma.'{"addressAttributeId":"address_section_attr_id'.$counter.'","addressTypeCode":"'.$cur_addr['addressTypeCode'].'","addressType":"'.$cur_addr['addressType'].'","addressLine1":"'.$cur_addr['addressLine1'].'","addressLine2":"'.$cur_addr['addressLine2'].'","city":"'.$cur_addr['city'].'","stateCode":"'.$cur_addr['stateCode'].'","state":"'.$cur_addr['state'].'","zipCode":"'.$cur_addr['zipCode'].'","countryId":'.$cur_addr['countryId'].',"countryName":"'.$cur_addr['countryName'].'"}';
-				$counter = $counter + 1;
-			}
-		}
-		
 		//Check to see if we passed in an array of custom attributes.  This array contains one or more attributes, and each attribute should have 3 values comma separated (attribute type, attribute id, attribute value)
 		if(Count($input_custom_attributes > 0))
 		{
@@ -244,6 +193,58 @@ class apptivo_toolset
 			}
 		}
 		
+		// Some attributes require a value.  But are not commonly used.  We'll check if a value as given, if not set to a default
+		if(!$case_data['assignedObjectId']){$case_data['assignedObjectId'] = 8;}
+		//These are required values, but the ID numbers change from firm to firm.  We'll use a default of one exists, or get a new one now.
+		if(!$case_data['caseType']){
+			if($this->caseType){
+				$case_data['caseType'] = $this->caseType;
+			}else{
+				$this->get_cases_settings();
+				$case_data['caseType'] = $this->caseType;
+			}
+		}
+		if(!$case_data['caseTypeId']){
+			if($this->caseTypeId){
+				$case_data['caseTypeId'] = $this->caseTypeId;
+			}else{
+				$this->get_cases_settings();
+				$case_data['caseTypeId'] = $this->caseTypeId;
+			}
+		}
+		if(!$case_data['caseStatus']){
+			if($this->caseStatus){
+				$case_data['caseStatus'] = $this->caseStatus;
+			}else{
+				$this->get_cases_settings();
+				$case_data['caseStatus'] = $this->caseStatus;
+			}
+		}
+		if(!$case_data['caseStatusId']){
+			if($this->caseStatusId){
+				$case_data['caseStatusId'] = $this->caseStatusId;
+			}else{
+				$this->get_cases_settings();
+				$case_data['caseStatusId'] = $this->caseStatusId;
+			}
+		}
+		if(!$case_data['casePriority']){
+			if($this->casePriority){
+				$case_data['casePriority'] = $this->casePriority;
+			}else{
+				$this->get_cases_settings();
+				$case_data['casePriority'] = $this->casePriority;
+			}
+		}
+		if(!$case_data['casePriorityId']){
+			if($this->casePriorityId){
+				$case_data['casePriorityId'] = $this->casePriorityId;
+			}else{
+				$this->get_cases_settings();
+				$case_data['casePriorityId'] = $this->casePriorityId;
+			}
+		}
+		
 		// These are mandatory fields that we cannot set a default for.  You must pass in these fields, or we'll return an error message.
 		$required_fields = Array('caseNumber','assignedObjectRefId','assignedObjectRefName','caseStatus','caseStatusId','caseType','caseTypeId','casePriority','casePriorityId');
 		foreach ($required_fields as $cur_field)
@@ -253,15 +254,11 @@ class apptivo_toolset
 				$form_message .= 'Error: '.$cur_field.' is empty.  This is a required field.  Please report this error to the website admin.<br />';
 			}
 		}
-		
 		// If we missed any required fields, $form_message will contain the errors.  Check for value and just return the message & exit if one is found.
 		if($form_message)
 		{
 			return $form_message;
 		}
-		
-		// Some attributes require a value.  But a0re not commonly used.  We'll check if a value as given, if not set to a default
-		if(!$case_data['assignedObjectId']){$case_data['assignedObjectId'] = 8;}
 		
 		// Some attributes need to have "null" passed in, if there is no value.  We'll check if a value was given, if not set to null.
 		if(!$case_data['caseItemId']){$case_data['caseItemId'] = 'null';}
@@ -279,9 +276,9 @@ class apptivo_toolset
 		
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 
-		$dat_result = curl_exec($this->ch);
+		$api_result = curl_exec($this->ch);
 		
-		$api_response = json_decode($dat_result);
+		$api_response = json_decode($api_result);
 		
 		print $api_url;
 		
@@ -293,16 +290,36 @@ class apptivo_toolset
 		}
 		
 	}
+//  Activity Management
+	function get_all_tasks()
+	{
+		$api_url = 'https://api.apptivo.com/app/dao/activities?a=getAllActivities&activityType=Task&isFromApp=home&objectStatus=0&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		curl_setopt($this->ch, CURLOPT_URL, $api_url);
+		$api_result = curl_exec($this->ch);
+		$api_response = json_decode($api_result);
+	
+		return $api_response;
+	}
+	
+	function update_task($attributeName, $activityId, $taskData)
+	{
+		$api_url = 'https://api.apptivo.com/app/dao/activities?a=updateTask&actType=home&activityId=...&attributeName=['.$attributeName.']&taskData={ ... }&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		curl_setopt($this->ch, CURLOPT_URL, $api_url);
+		$api_result = curl_exec($this->ch);
+		$api_response = json_decode($api_result);
+	
+		return $api_response;
+	}
 
 // General data utility methods - get lists of countries/states, retrieve configuration settings, retrieve employee lists, etc.
 	
-		function get_countries()
+	function get_countries()
 	{
 		$api_url = 'https://api.apptivo.com/app/commonservlet?a=getAllCountries&apiKey='.$this->api_key.'&accessKey='.$this->access_key.'&userName='.$this->user_name;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 
-		$dat_result = curl_exec($this->ch);
-		$api_response = json_decode($dat_result);
+		$api_result = curl_exec($this->ch);
+		$api_response = json_decode($api_result);
 
 		return $api_response;
 	}
@@ -312,9 +329,29 @@ class apptivo_toolset
 		$api_url = 'https://api.apptivo.com/app/commonservlet?a=getAllStatesByCountryId&countryId='.$input_country_id.'&api_key='.$this->api_key.'&accessKey='.$this->access_key.'&userName='.$this->user_name;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 
-		$dat_result = curl_exec($this->ch);
-		$api_response = json_decode($dat_result);
+		$api_result = curl_exec($this->ch);
+		$api_response = json_decode($api_result);
 
+		return $api_response;
+	}
+	
+	//Get settings by App.  When this is called, we'll store some required values defaults that can be overridden later.
+	function get_cases_settings()
+	{
+		$api_url = 'https://api.apptivo.com/app/dao/case?a=getCasesConfigData&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		curl_setopt($this->ch, CURLOPT_URL, $api_url);
+
+		$api_result = curl_exec($this->ch);
+		$api_response = json_decode($api_result);
+		
+		//Take the required fields and grab the first value to set as default
+		$this->caseType = urlencode($api_response->caseType[0]->meaning);
+		$this->caseTypeId = $api_response->caseType[0]->lookupId;
+		$this->caseStatus = urlencode($api_response->caseStatus[0]->meaning);
+		$this->caseStatusId = $api_response->caseStatus[0]->lookupId;
+		$this->casePriority = urlencode($api_response->casePriority[0]->meaning);
+		$this->casePriorityId = $api_response->casePriority[0]->lookupId;
+		
 		return $api_response;
 	}
 	
@@ -382,6 +419,8 @@ class apptivo_toolset
 	{
 		curl_close($this->ch);
 	}
+	
+	
 
 }
 

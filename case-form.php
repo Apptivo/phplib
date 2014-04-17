@@ -32,14 +32,6 @@ if(isset($_POST['caseSummary']))
 	$case_data['assignedObjectRefName'] = urlencode('Kenny Clark');
 	$case_data['caseNumber'] = 'Auto+generated+number';
 	
-	//temp hard-code, need to dynamically produce
-	$case_data['caseType'] = 'Other';
-	$case_data['caseTypeId'] = '6826995';
-	$case_data['caseStatus'] = 'New';
-	$case_data['caseStatusId'] = '6826985';
-	$case_data['casePriority'] = 'Medium';
-	$case_data['casePriorityId'] = '6826984';
-	
 	//Check if this customer exists in the system
 	/*  Just hard-coding the customer value for now to ensure the create_case method works OK.  Will introduce this as common method next.
 	$api_get_customer_url = 'https://'.$api_environment.'/app/dao/customer?a=getAllcustomersByEmailId&apiKey='.$api_key.'&accessKey='.$access_key.'&assigneeId=30389&assignedType=employee&emailId='.$customer_email_address.'&userName='.$user_email_address;
@@ -74,7 +66,7 @@ if(isset($_POST['caseSummary']))
 	*/
 	
 	//Finally, we call the method to create a case.  Returns a success/failure message
-	$form_message = $apptivo->create_case($case_data, $phone_numbers, $addresses, $emails, $custom_attributes);
+	$form_message = $apptivo->create_case($case_data, $custom_attributes);
 }else{
 	$form_message = 'Please complete the form below to proceed';
 }
