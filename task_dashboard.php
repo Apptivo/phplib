@@ -6,6 +6,7 @@ session_start();
   
 // *****START CONFIGURATION*****
 	//Supply the API & Access keys for your Apptivo account
+	
 	$api_key = 'cb83cbc3-7efc-4457-9beb-a72871187cea'; // Replace this with your business api key
 	$access_key = 'grxPZSZKvEtB-eIArCNDnLNXl-0910a13e-651b-4e63-8175-86cb8f243b2a';  //Replace this with your business access key
 // *****END CONFIGURATION*****
@@ -27,7 +28,6 @@ if($_GET['action'] == 'reschedule_task')
 {		
 	if($_SESSION['sortColumn'] == $_GET['sortColumn'])
 	{
-		print 'moooo';
 		if($_SESSION['sortDir'] == 'desc')
 		{
 			$sortDir = 'asc';
@@ -40,15 +40,15 @@ if($_GET['action'] == 'reschedule_task')
 	}
 }
 
-//Default the sort to priority if none found
-if($_SESSION['sortColumn'] && $sortDir == '')
+//Default the sort to priority desc if none found
+if($_SESSION['sortColumn'] == '' && $sortDir == '')
 {
 	$sortColumn = 'priorityName.sortable';
-	$sortDir = $_SESSION['sortColumn'];
+	$sortDir = 'desc';
 }
 
 $_SESSION['sortColumn'] = $sortColumn;
-$_SESSION['sortDir'] = $sortdir;
+$_SESSION['sortDir'] = $sortDir;
 
 //Retrieve my task data
 $task_data = $apptivo->get_all_tasks($sortColumn,$sortDir);
@@ -69,7 +69,7 @@ $task_data = $apptivo->get_all_tasks($sortColumn,$sortDir);
 						<a href="/task_dashboard.php?action=sort&sortColumn=endDate">Due Date View</a>
 					</div>
 			');
-			
+						
 			//Loop through each task
 			foreach($task_data->tasks as $ctask)
 			{
@@ -77,6 +77,7 @@ $task_data = $apptivo->get_all_tasks($sortColumn,$sortDir);
 				$time_1day = date("m/d/Y",strtotime("+1 day", strtotime($ctask->endDate)));
 				$time_7day = date("m/d/Y",strtotime("+7 day", strtotime($ctask->endDate)));
 				$time_21day = date("m/d/Y",strtotime("+21 day", strtotime($ctask->endDate)));
+				
 				echo('
 					<div class="task_cnt">
 						<h2>'.$ctask->subject.'</h2>

@@ -294,6 +294,7 @@ class apptivo_toolset
 	function get_all_tasks($sortColumn, $sortDir)
 	{
 		$api_url = 'https://api.apptivo.com/app/dao/activities?a=getAllActivities&activityType=Task&isFromApp=home&sortColumn='.$sortColumn.'&sortDir='.$sortDir.'&objectStatus=0&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);
 		$api_response = json_decode($api_result);
