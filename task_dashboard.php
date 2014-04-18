@@ -1,7 +1,7 @@
 <?php
 session_start();
 /* ABOUT THIS FILE 
-   Todd Task!
+   A minimal task dashboard with lot's of hard-coded items to match my specific preferences.  Maybe later this can be adapted for general usage.
 */
   
 // *****START CONFIGURATION*****
@@ -57,12 +57,14 @@ $task_data = $apptivo->get_all_tasks($sortColumn,$sortDir);
 <html>
 	<head>
 	<link rel="stylesheet" type="text/css" media="all" href="task_style.css" />
+	<script href="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	</head>
 	<body>
 		<?php
 			/* START Task Dashboard HTML */
 			echo('
 				<div id="page_cnt">
+					<form id="task_form" method="POST"  action="/task_dashboard.php">
 					<div class="message">'.$message.'</div>
 					<div class="nav">
 						<a href="/task_dashboard.php?action=sort&sortColumn=priorityName.sortable">Priority View</a>
@@ -83,7 +85,13 @@ $task_data = $apptivo->get_all_tasks($sortColumn,$sortDir);
 						<h2>'.$ctask->subject.'</h2>
 						<div class="task_lft">
 							<p>'.$ctask->description.'</p>
-							<p><strong>Priority: </strong>'.$ctask->priorityName.'</p>
+							<p><strong>Priority: </strong>
+							<select value="'.$ctask->priorityName.'" class="priority_dd">
+								<option value="P1 - Low">P1 - Low</option>
+								<option value="P4 - Urgent">P4 - Urgent</option>
+							</select>
+							
+							'.$ctask->priorityName.'</p>
 							<p><strong>Due: </strong>'.$ctask->endDate.'</p>
 							<p><strong>Created: </strong>'.$ctask->creationDate.'</p>
 						</div>
@@ -100,10 +108,18 @@ $task_data = $apptivo->get_all_tasks($sortColumn,$sortDir);
 			}
 			
 			echo('
+				</form>
 				</div>
 			');
 			/* START Task Dashboard HTML */
 		?>
+		<script>
+		$(function() {
+			$('.priority_dd').change(function() {
+				this.form.submit();
+			});
+		});
+		</script>
 	</body>
 </html>
 
