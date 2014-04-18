@@ -291,9 +291,9 @@ class apptivo_toolset
 		
 	}
 //  Activity Management
-	function get_all_tasks()
+	function get_all_tasks($sortColumn, $sortDir)
 	{
-		$api_url = 'https://api.apptivo.com/app/dao/activities?a=getAllActivities&activityType=Task&isFromApp=home&objectStatus=0&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/activities?a=getAllActivities&activityType=Task&isFromApp=home&sortColumn='.$sortColumn.'&sortDir='.$sortDir.'&objectStatus=0&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);
 		$api_response = json_decode($api_result);
@@ -303,10 +303,13 @@ class apptivo_toolset
 	
 	function update_task($attributeName, $activityId, $taskData)
 	{
-		$api_url = 'https://api.apptivo.com/app/dao/activities?a=updateTask&actType=home&activityId=...&attributeName=['.$attributeName.']&taskData={ ... }&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/activities?a=updateTask&actType=home&activityId='.$activityId.'&attributeName=["'.$attributeName.'"]&taskData={"endDate":"'.$taskData['endDate'].'"}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);
 		$api_response = json_decode($api_result);
+	
+	
+		print $api_url;
 	
 		return $api_response;
 	}
