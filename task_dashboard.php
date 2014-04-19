@@ -21,7 +21,8 @@ if($_GET['action'] == 'reschedule_task')
 		'endDate'=> $_GET['endDate']
 	);
 
-	$apptivo->update_task('endDate',$_GET['id'], $taskData);
+
+	$apptivo->update_task('endDate',$_GET['id'], json_encode($taskData));
 	
 	$message = 'Task Updated';
 } elseif ($_GET['action'] == 'sort')
@@ -50,8 +51,34 @@ if($_SESSION['sortColumn'] == '' && $sortDir == '')
 $_SESSION['sortColumn'] = $sortColumn;
 $_SESSION['sortDir'] = $sortDir;
 
+if($_GET['test'] == 'true')
+{
+	$taskData = Array (
+		'priorityCode'=> null,
+		'priorityName' => '',
+		'priorityId' => '22125297'
+	);
+
+	//"priorityCode":null,"priorityName":"","priorityId":"22125297"
+
+
+	$apptivo->update_task('priorityCode','38125', json_encode($taskData));
+}
+
+
 //Retrieve my task data
 $task_data = $apptivo->get_all_tasks($sortColumn,$sortDir);
+
+//Get the priorities for this firm to render in dropdown below
+$task_priorities = $apptivo->get_task_priorities();
+
+foreach ($task_priorities as $priority)
+{
+	print_r($priority);
+	print '<br><br>';
+}
+
+
 ?>
 
 <html>
@@ -87,6 +114,7 @@ $task_data = $apptivo->get_all_tasks($sortColumn,$sortDir);
 							<p>'.$ctask->description.'</p>
 							<p><strong>Priority: </strong>
 							<select value="'.$ctask->priorityName.'" class="priority_dd">
+							
 								<option value="P1 - Low">P1 - Low</option>
 								<option value="P4 - Urgent">P4 - Urgent</option>
 							</select>

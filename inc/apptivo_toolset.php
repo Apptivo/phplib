@@ -294,7 +294,6 @@ class apptivo_toolset
 	function get_all_tasks($sortColumn, $sortDir)
 	{
 		$api_url = 'https://api.apptivo.com/app/dao/activities?a=getAllActivities&activityType=Task&isFromApp=home&sortColumn='.$sortColumn.'&sortDir='.$sortDir.'&objectStatus=0&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
-		
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);
 		$api_response = json_decode($api_result);
@@ -304,14 +303,32 @@ class apptivo_toolset
 	
 	function update_task($attributeName, $activityId, $taskData)
 	{
-		$api_url = 'https://api.apptivo.com/app/dao/activities?a=updateTask&actType=home&activityId='.$activityId.'&attributeName=["'.$attributeName.'"]&taskData={"endDate":"'.$taskData['endDate'].'"}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+	
+		$api_url = 'https://api.apptivo.com/app/dao/activities?a=updateTask&actType=home&activityId='.$activityId.'&attributeName=["'.$attributeName.'"]&taskData={"'.$attributeName.'":"'.$taskData.'"}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		
+		$api_url = 'https://api.apptivo.com/app/dao/activities?a=updateTask&actType=home&activityId='.$activityId.'&attributeName=["'.$attributeName.'"]&taskData='.$taskData.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		
+		
+		
+		print $api_url;
+		
+		
+		print '<br><br>';
+		
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);
 		$api_response = json_decode($api_result);
+
+		return $api_response;
+	}
 	
-	
-		print $api_url;
-	
+	function get_task_priorities()
+	{
+		$api_url = 'https://www.apptivo.com/app/commonservlet?a=getLookups&app_req_type=ajax&lookupType=PRIORITY&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		curl_setopt($this->ch, CURLOPT_URL, $api_url);
+		$api_result = curl_exec($this->ch);
+		$api_response = json_decode($api_result);
+
 		return $api_response;
 	}
 
