@@ -101,22 +101,27 @@ if(isset($_POST['lastName']))
 		//Custom Fields.  The attribute IDs need to be hard-coded.  Learn how to find these values here: https://github.com/Apptivo/phplib/wiki/Locating-ID-Numbers-&-Other-Data
 		$custom_attributes = Array(
 			Array (
-				'customAttributeType' => 'select',
-				'id' => 'attr_11756_8834_select_6950d1d89a0a96715e5a350129e90346',
-				'customAttributeValue' => $_POST['lead_isp'] // This is the value passed in from the web form
+					'customAttributeType' => 'select',
+					'id' => 'attr_11756_8834_select_6950d1d89a0a96715e5a350129e90346',
+					'customAttributeValue' => $_POST['lead_isp'] // This is the value passed in from the web form
 			),
 			Array (
-				'customAttributeType' => 'input',
-				'id' => 'attribute_input_1390553045821_8872',
-				'customAttributeValue' => $_POST['lead_speed'] // This is the value passed in from the web form
+					'customAttributeType' => 'input',
+					'id' => 'attribute_input_1390553045821_8872',
+					'customAttributeValue' => $_POST['lead_speed'] // This is the value passed in from the web form
 			),
-			Array (
+			Array(
 				'customAttributeType' => 'textarea',
-				'id' => 'attribute_textarea_1414645553485_2116',
-				'customAttributeValue' => urlencode($_POST['special_instructions']) // This is the value passed in from the web form
+				'id' => 'attribute_textarea_1415171727644_5969',
+				'customAttributeValue' => urlencode($_POST['adtitle'])
+			),
+			Array (
+					'customAttributeType' => 'input',
+					'id' => 'attribute_input_1415171944315_8221',
+					'customAttributeValue' => urlencode($_POST['adDuration']) 
 			)
 		);
-	
+			
 	//Finally, we call the method to create a lead.  Returns a success/failure message
 	$form_message = $apptivo->create_lead($lead_data, $phone_numbers, $addresses, $emails, $custom_attributes);
 }else{
@@ -154,8 +159,6 @@ if(isset($_POST['lastName']))
 						<option name="Google Fiber">Google Fiber</option>
 						<option name="Time Warner">Time Warner</option>
 					</select><br />
-					<label>Special Instructions</label>
-					<textarea name="special_instructions"></textarea><br />
 					<label>Internet Speed: </label>
 					<input type="text" name="lead_speed" /><br />
 					<label>Comments: </label>
@@ -170,10 +173,71 @@ if(isset($_POST['lastName']))
 					'.$apptivo->get_state_dropdown_html('176').'<br />
 					<label>Zip: </label>
 					<input type="text" name="address_zip" /><br />
+					<label>Adventure Title: </label>
+					<textarea id="adtitle" name="adtitle"></textarea><br />
+					<label>Adventure Duration: </label>
+					<input type="text" name="adDuration" /><br />
+			
 					<input type="submit" value="Submit" />
 				</form>
-			');
+
+			'); 
+			
 			/* END Web Form HTML*/
+			
+			/* START Web Form HTML*/
+			/*echo('
+				<div class="form_message">'.$form_message.'</div>
+				<form class="apptivo_form" action="'.$_SERVER['REQUEST_URI'].'" method="post" name="form">
+					<label>First Name: </label>
+					<input type="text" name="firstName" /><br />
+					<label>Last Name: </label>
+					<input type="text" name="lastName" /><br />
+
+					<label>Company: </label>
+					<input type="text" name="companyName" /><br />
+					<label>Job Title: </label>
+					<input type="text" name="jobTitle" /><br />
+					<label>Email: </label>
+					'.$apptivo->get_email_type_dropdown_html('1').'<br />
+					<label>Alternate Email: </label>
+					'.$apptivo->get_email_type_dropdown_html('2').'<br />
+					<label>Phone: </label>
+					'.$apptivo->get_phone_type_dropdown_html('1').'<br />
+					<label>Alternate Phone: </label>
+					'.$apptivo->get_phone_type_dropdown_html('2').'<br />
+					<input type="text" name="address_1" /><br />
+					<label>Address 2: </label>
+					<input type="text" name="address_2" /><br />
+					<label>City: </label>
+					<input type="text" name="address_city" /><br />
+					<label>State: </label>
+					'.$apptivo->get_state_dropdown_html('176').'<br />
+					<label>Zip: </label>
+					<input type="text" name="address_zip" /><br />
+					
+					<label>Adventure Title: </label>
+					<input type="textarea" name="adventureTitle" /><br />
+					<label>Adventure Description: </label>
+					<input type="textarea" name="adventureDescription" /><br />
+					<label>Adventure Instructions: </label>
+					<input type="textarea" name="adventureInstructions" /><br />
+					<label>User Warnings: </label>
+					<input type="textarea" name="userWarnings" /><br />
+					<label>Adventure Duration: </label>
+					<input type="text" name="adventureDuration" /><br />
+					<label>Adventure Pricing: </label>
+					<input type="textarea" name="adventurePricing" /><br />
+					<label>Video Link: </label>
+					<input type="text" name="videoLink" /><br />
+					
+					<input type="submit" value="Submit" />
+				</form>
+
+			'); */
+			
+			/* END Web Form HTML*/
+
 		?>
 	</body>
 </html>

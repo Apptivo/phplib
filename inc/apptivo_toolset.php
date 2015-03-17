@@ -16,7 +16,25 @@ class apptivo_toolset
 	public $casePriority;
 	public $casePriorityId;
 	
-// Primary Methods: Create Lead, Create Case, Create Customer, etc
+// Get All Methods: Read All Contacts, etc
+	function get_all_contacts($startIndex)
+	{
+		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=getAllContacts&startIndex='.$startIndex.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		curl_setopt($this->ch, CURLOPT_URL, $api_url);
+		$api_result = curl_exec($this->ch);
+		return json_decode($api_result);		
+	}
+	
+// Get by ID Methods: Get Contact By ID, Get Customer By ID, Get Case By ID, etc.
+	function get_contact_by_id($contact_id)
+	{
+		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=getContactByContactId&contactId='.$contact_id.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		curl_setopt($this->ch, CURLOPT_URL, $api_url);
+		$api_result = curl_exec($this->ch);
+		return json_decode($api_result);	
+	}
+	
+// Create Methods: Create Lead, Create Case, Create Customer, etc
 	
 	function create_lead($lead_data, $input_phone_numbers, $input_addresses, $input_emails, $input_custom_attributes)
 	{
@@ -162,9 +180,7 @@ class apptivo_toolset
 		$api_result = curl_exec($this->ch);
 		
 		$api_response = json_decode($api_result);
-		
-		print $api_url;
-		
+				
 		if($api_response)
 		{
 			return 'Thank you, your submission has been received!';
@@ -290,6 +306,173 @@ class apptivo_toolset
 		}
 		
 	}
+	
+	function create_customer($customer_data, $input_phone_numbers, $input_addresses, $input_emails, $input_custom_attributes)
+	{
+		//Phone Numbers
+		if(Count($input_phone_numbers > 0))
+		{
+			$counter = 1;
+			foreach($input_phone_numbers as $cur_phone)
+			{
+				if($counter == 1)
+				{
+					$add_comma = '';
+					$counter_text = ''; //Don't change the ID for the first number, or else we get a blank field.
+				}else{
+					$add_comma = ',';
+					$counter_text = $counter;
+				}
+				$phone_numbers .= $add_comma.'{"phoneNumber":"'.$cur_phone['phoneNumber'].'","phoneTypeCode":"'.$cur_phone['phoneType'].'","phoneType":"'.$cur_phone['phoneType'].'","id":"customer_phone_input'.$counter_text.'"}';
+				$counter = $counter + 1;
+			}
+		}
+		
+		//Email Addresses
+		if(Count($input_emails > 0))
+		{
+			$counter = 1;
+			foreach($input_emails as $cur_email)
+			{
+				if($counter == 1)
+				{
+					$add_comma = '';
+					$counter_text = ''; //Don't change the ID for the first number, or else we get a blank field.
+				}else{
+					$add_comma = ',';
+					$counter_text = $counter;
+				}
+				$emails .= $add_comma.'{"emailAddress":"'.$cur_email['emailAddress'].'","emailType":"'.$cur_email['emailType'].'","emailTypeCode":"'.$cur_email['emailType'].'","id":"cont_email_input'.$counter_text.'"}';
+				$counter = $counter + 1;
+			}
+		}
+		
+		// Address fields
+		if(Count($input_addresses > 0))
+		{
+			$counter = 1;
+			foreach($input_addresses as $cur_addr)
+			{
+				$phone_type = explode(',', $cur_addr[0]);
+				if($counter == 1)
+				{
+					$add_comma = '';
+				}else{
+					$add_comma = ',';
+				}
+				$addresses .= $add_comma.'{"addressAttributeId":"address_section_attr_id'.$counter.'","addressTypeCode":"'.$cur_addr['addressTypeCode'].'","addressType":"'.$cur_addr['addressType'].'","addressLine1":"'.$cur_addr['addressLine1'].'","addressLine2":"'.$cur_addr['addressLine2'].'","city":"'.$cur_addr['city'].'","stateCode":"'.$cur_addr['stateCode'].'","state":"'.$cur_addr['state'].'","zipCode":"'.$cur_addr['zipCode'].'","countryId":'.$cur_addr['countryId'].',"countryName":"'.$cur_addr['countryName'].'"}';
+				$counter = $counter + 1;
+			}
+		}
+		
+		//Check to see if we passed in an array of custom attributes.  This array contains one or more attributes, and each attribute should have 3 values comma separated (attribute type, attribute id, attribute value)
+		if(Count($input_custom_attributes > 0))
+		{
+			$counter = 1;
+			foreach($input_custom_attributes as $cur_attr)
+			{
+				if($counter == 1)
+				{
+					$add_comma = '';
+				}else{
+					$add_comma = ',';
+				}
+				$custom_attr .= $add_comma.'{"customAttributeType":"'.$cur_attr['customAttributeType'].'","id":"'.$cur_attr['id'].'","customAttributeName":"'.$cur_attr['id'].'","customAttributeId":"'.$cur_attr['id'].'","customAttributeValue":"'.$cur_attr['customAttributeValue'].'"}';
+				$counter = $counter + 1;
+			}
+		}
+		
+		// These are mandatory fields that we cannot set a default for.  You must pass in these fields, or we'll return an error message.
+		$required_fields = Array('assigneeObjectRefId','assigneeObjectRefName','customerNumber','customerName');
+		foreach ($required_fields as $cur_field)
+		{
+			if(!$customer_data[$cur_field])
+			{
+				$form_message .= 'Error: '.$cur_field.' is empty.  This is a required field.  Please report this error to the website admin.<br />';
+			}
+		}
+		
+		// If we missed any required fields, $form_message will contain the errors.  Check for value and just return the message & exit if one is found.
+		if($form_message)
+		{
+			return $form_message;
+		}
+		
+		// Some attributes require a value.  But a0re not commonly used.  We'll check if a value as given, if not set to a default
+
+		
+		// Some attributes need to have "null" passed in, if there is no value.  We'll check if a value was given, if not set to null.
+		if(!$customer_data['campaignId']){$customer_data['campaignId'] = 'null';}
+		if(!$customer_data['territoryId']){$customer_data['territoryId'] = 'null';}
+		if(!$customer_data['marketId']){$customer_data['marketId'] = 'null';}
+		if(!$customer_data['marketName']){$customer_data['marketName'] = 'null';}
+		if(!$customer_data['segment_id']){$customer_data['segment_id'] = 'null';}
+		if(!$customer_data['segmentName']){$customer_data['segmentName'] = 'null';}
+		if(!$customer_data['followUpDate']){$customer_data['followUpDate'] = 'null';}
+		if(!$customer_data['followUpDescription']){$customer_data['followUpDescription'] = 'null';}
+		if(!$customer_data['employeeRangeId']){$customer_data['employeeRangeId'] = 'null';}
+		if(!$customer_data['employeeRange']){$customer_data['employeeRange'] = 'null';}
+		if(!$customer_data['annualRevenue']){$customer_data['annualRevenue'] = 'null';}
+		
+		//if(!$addresses){$addresses = '{"addressAttributeId":"address_section_attr_id","addressTypeCode":"1","addressType":"Billing+Address","addressLine1":"","addressLine2":"","city":"","stateCode":"","zipCode":"","countryId":176,"countryName":"United+States","deliveryInstructions":""}';}
+		
+		/* These are other possible values that could be passed in
+			$customer_data['skypeName']
+			$customer_data['estimatedCloseDate']
+			$customer_data['campaignName']
+			$customer_data['territoryName']
+			$customer_data['lastUpdatedByName']
+			$customer_data['createdByName']
+			$customer_data['lastUpdateDate']
+			$customer_data['creationDate']
+			$customer_data['industry']
+			$customer_data['industryName']
+			$customer_data['ownership']
+			$customer_data['website']
+			$customer_data['faceBookURL']
+			$customer_data['twitterURL']
+			$customer_data['linkedInURL']
+		*/
+		 
+		$api_url = 'https://api.apptivo.com/app/dao/customers?a=createCustomer&customerData={"customerName":"'.$customer_data['customerName'].'","customerNumber":"'.$customer_data['customerNumber'].'","customerCategory":"'.$customer_data['customerCategory'].'","customerCategoryId":"'.$customer_data['customerCategoryId'].'","assigneeObjectRefName":"'.$customer_data['assigneeObjectRefName'].'","assigneeObjectId":8,"assigneeObjectRefId":'.$customer_data['assigneeObjectRefId'].',"description":"","phoneNumber":"","contactEmail":"","skypeName":"","parentCustomerName":"","parentCustomerId":null,"employeeRange":"","employeeRangeId":null,"website":"","tickerSymbol":"","annualRevenue":null,"campaignName":"","campaignId":null,"creditRating":"","marketName":"","marketId":null,"segmentName":"","segmentId":null,"territoryName":"","territoryId":null,"industryName":"","industryId":null,"paymentTerm":"Immediate","paymentTermId":"'.$customer_data['paymentTermId'].'","ownership":"","slaName":"","slaId":null,"followUpDate":null,"followUpDescription":null,"createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","isExistingCustomer":"N","isAffiliate":"N","faceBookURL":"","twitterURL":"","linkedInURL":"","phoneNumbers":['.$phone_numbers.'],"emailAddresses":['.$emails.'],"searchColumn":"'.$customer_data['customerName'].'","addresses":['.$addresses.'],"labels":[],"customAttributes":['.$custom_attr.'],"customerId":null,"createdBy":null,"lastUpdatedBy":null}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+				
+		curl_setopt($this->ch, CURLOPT_URL, $api_url);
+
+		$api_result = curl_exec($this->ch);
+		
+		return json_decode($api_result);
+	}
+// Update Methods
+	function update_contact($contactId, $attributeName, $contactData)
+	{
+		if(!$customer_data['segment_id']){$customer_data['segment_id'] = 'null';}
+	
+		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=updateContact&objectId=2&contactId='.$contactId.'&attributeName='.$attributeName.'&contactData='.$contactData.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		curl_setopt($this->ch, CURLOPT_URL, $api_url);
+		
+		$api_result = curl_exec($this->ch);
+		
+		return json_decode($api_result);
+	}
+	
+// Search Methods
+	function search_customers_by_name($customerName)
+	{
+		$api_url = 'https://api.apptivo.com/app/dao/customers?a=getAllCustomersByAdvancedSearch&objectId=3&startIndex=0&numRecords=250&sortColumn='.urlencode('customerName.sortable').'&sortDir=asc&searchData={"customerName":"'.$customerName.'","customerNumber":"","":"on","assigneeObjectRefName":null,"assigneeObjectId":null,"assigneeObjectRefId":null,"description":"","phoneType":"-1","phoneNumber":"","emailType":"-1","contactEmail":"","skypeName":"","parentCustomerName":"","parentCustomerId":null,"website":"","tickerSymbol":"","annualRevenue":null,"annualRevenueTo":"","campaignName":"","campaignId":null,"creditRating":"","territoryName":"","territoryId":null,"ownership":"","followUpDate":"","followUpDescription":"","createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","isExistingCustomer":"N","isAffiliate":"N","faceBookURL":"","twitterURL":"","linkedInURL":"","phoneNumbers":[{"phoneNumber":"","phoneType":"'.urlencode('Select One').'","phoneTypeCode":"-1","id":"cust_phone_input"}],"emailAddresses":[{"emailAddress":"","emailTypeCode":"-1","emailType":"","id":"cont_email_input"}],"searchColumn":"","addresses":[{"addressAttributeId":"addressAttributeId_1414492924019_8891","addressType":"","addressLine1":"","addressLine2":"","city":"","stateCode":"","state":"","zipCode":"","countryId":-1,"countryName":"'.urlencode('Select One').'","deliveryInstructions":""}],"labels":[],"customAttributes":[]}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		curl_setopt($this->ch, CURLOPT_URL, $api_url);
+		$api_result = curl_exec($this->ch);
+		
+		return json_decode($api_result);
+	}
+	
+	function search_opportunities_by_customer($customerName, $customerId)
+	{
+		$api_url = 'https://api.apptivo.com/app/dao/v6/opportunities?a=getAllByAdvancedSearch&startIndex=0&numRecords=1&sortColumn=_score&sortDir=&iDisplayLength=50&iDisplayStart=0&sSortDir_0=&iSortCol_0=&searchData=%7B%22opportunityCustomer%22%3A%22'.$customerName.'%22%2C%22opportunityName%22%3A%22%22%2C%22opportunityCustomerId%22%3A'.$customerId.'%2C%22probability%22%3Anull%2C%22probabilityTo%22%3Anull%2C%22opportunityContact%22%3A%22%22%2C%22opportunityContactId%22%3Anull%2C%22closeDate%22%3A%22%22%2C%22closeDateTo%22%3A%22%22%2C%22nextStep%22%3A%22%22%2C%22amount%22%3Anull%2C%22amountTo%22%3Anull%2C%22campaignName%22%3A%22%22%2C%22campaignId%22%3Anull%2C%22description%22%3A%22%22%2C%22followUpDescription%22%3A%22%22%2C%22createdByName%22%3A%22%22%2C%22lastUpdatedByName%22%3A%22%22%2C%22territoryName%22%3A%22%22%2C%22territoryId%22%3Anull%2C%22labels%22%3A%5B%5D%2C%22assignedToObjectRefName%22%3A%22%22%2C%22currencyCode%22%3Anull%2C%22customAttributes%22%3A%5B%7B%22customAttributeId%22%3A%22cust_attr_98629_cust_attr_opportunities_89849_input_c4f4988810ec2da72b2f1551f3f155c0%22%2C%22customAttributeType%22%3A%22input%22%2C%22customAttributeTagName%22%3A%22cust_attr_98629_cust_attr_opportunities_89849_input_c4f4988810ec2da72b2f1551f3f155c0%22%2C%22customAttributeName%22%3A%22cust_attr_98629_cust_attr_opportunities_89849_input_c4f4988810ec2da72b2f1551f3f155c0%22%7D%2C%7B%22customAttributeId%22%3A%22section_1421042942879_3079_attribute_checkbox_1421042974780_89%22%2C%22customAttributeValue%22%3A%22%22%2C%22customAttributeType%22%3A%22check%22%2C%22customAttributeTagName%22%3A%22section_1421042942879_3079_attribute_checkbox_1421042974780_89%22%2C%22attributeValues%22%3A%5B%5D%7D%2C%7B%22customAttributeId%22%3A%22cust_attr_78218_cust_attr_opportunities_80424_input_93c731f1c3a84ef05cd54d044c379eaa%22%2C%22customAttributeType%22%3A%22input%22%2C%22customAttributeTagName%22%3A%22cust_attr_78218_cust_attr_opportunities_80424_input_93c731f1c3a84ef05cd54d044c379eaa%22%2C%22customAttributeName%22%3A%22cust_attr_78218_cust_attr_opportunities_80424_input_93c731f1c3a84ef05cd54d044c379eaa%22%7D%2C%7B%22customAttributeId%22%3A%22cust_attr_70886_cust_attr_opportunities_80424_input_2f8a6bf31f3bd67bd2d9720c58b19c9a%22%2C%22customAttributeType%22%3A%22input%22%2C%22customAttributeTagName%22%3A%22cust_attr_70886_cust_attr_opportunities_80424_input_2f8a6bf31f3bd67bd2d9720c58b19c9a%22%2C%22customAttributeName%22%3A%22cust_attr_70886_cust_attr_opportunities_80424_input_2f8a6bf31f3bd67bd2d9720c58b19c9a%22%7D%2C%7B%22customAttributeId%22%3A%22cust_attr_opportunities_80424_attribute_1381192636307_3623%22%2C%22customAttributeType%22%3A%22input%22%2C%22customAttributeTagName%22%3A%22attribute_input_1381192636307_2188%22%2C%22customAttributeName%22%3A%22attribute_input_1381192636307_2188%22%7D%5D%2C%22addresses%22%3A%5B%5D%7D&multiSelectData=%7B%22salesStageIds%22%3A%5B%5D%2C%22opportunityTypeIds%22%3A%5B%5D%2C%22leadSourceIds%22%3A%5B%5D%2C%22marketIds%22%3A%5B%5D%2C%22segmentIds%22%3A%5B%5D%7D&amountFrom=&amountTo=&probabilityFrom=&probabilityTo=&closeDateFrom=&closeDateTo=&objectId=11&onScrollCount=1&status=0&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		curl_setopt($this->ch, CURLOPT_URL, $api_url);
+		$api_result = curl_exec($this->ch);
+		return json_decode($api_result);
+	}
+	
 //  Activity Management
 	function get_all_tasks($sortColumn, $sortDir)
 	{
@@ -336,7 +519,7 @@ class apptivo_toolset
 	
 	function get_countries()
 	{
-		$api_url = 'https://api.apptivo.com/app/commonservlet?a=getAllCountries&apiKey='.$this->api_key.'&accessKey='.$this->access_key.'&userName='.$this->user_name;
+		$api_url = 'https://api.apptivo.com/app/commonservlet?a=getAllCountries&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 
 		$api_result = curl_exec($this->ch);
@@ -347,7 +530,7 @@ class apptivo_toolset
 	
 	function get_states_by_country($input_country_id)
 	{
-		$api_url = 'https://api.apptivo.com/app/commonservlet?a=getAllStatesByCountryId&countryId='.$input_country_id.'&api_key='.$this->api_key.'&accessKey='.$this->access_key.'&userName='.$this->user_name;
+		$api_url = 'https://api.apptivo.com/app/commonservlet?a=getAllStatesByCountryId&countryId='.$input_country_id.'&api_key='.$this->api_key.'&accessKey='.$this->access_key;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 
 		$api_result = curl_exec($this->ch);
