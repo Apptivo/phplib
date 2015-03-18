@@ -290,18 +290,11 @@ class apptivo_toolset
 		*/
 			
 		$api_url = 'https://api.apptivo.com/app/dao/opportunities?a=createOpportunity&opportunityData={"opportunityName":"'.$opportunity_data['opportunityName'].'","salesStageName":"'.$opportunity_data['salesStageName'].'","salesStageId":"'.$opportunity_data['salesStageId'].'","":"","opportunityCustomer":"'.$opportunity_data['opportunityCustomer'].'","opportunityCustomerId":'.$opportunity_data['opportunityCustomerId'].',"probability":"'.$opportunity_data['probability'].'","opportunityContact":"'.$opportunity_data['opportunityContact'].'","opportunityContactId":'.$opportunity_data['opportunityContactId'].',"opportunityTypeName":"'.$opportunity_data['opportunityTypeName'].'","opportunityTypeId":"'.$opportunity_data['opportunityTypeId'].'","leadSourceTypeName":"'.$opportunity_data['leadSourceTypeName'].'","leadSourceTypeId":"'.$opportunity_data['leadSourceTypeId'].'","closeDate":"'.$opportunity_data['closeDate'].'","nextStep":"","assignedToObjectRefName":"'.$opportunity_data['assignedToObjectRefName'].'","assignedToObjectId":8,"assignedToObjectRefId":'.$opportunity_data['assignedToObjectRefId'].',"amount":0,"currencyCode":"USD","campaignName":"","campaignId":null,"description":"","followUpDate":null,"followUpDescription":null,"createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","marketName":"","marketId":null,"segmentName":"","segmentId":null,"territoryName":"'.$opportunity_data['territoryName'].'","territoryId":'.$opportunity_data['territoryId'].',"section_1423271450718_1343_attribute_radio_1423271792653_2867":"No","searchColumn":"'.$opportunity_data['searchColumn'].'","addresses":[],"customAttributes":['.$custom_attr.'],"labels":[],"opportunityId":null,"createdBy":null,"lastUpdatedBy":null,"isMultiCurrency":"Y"}&fromObjectId=null&fromObjectRefId=null&isDuplicate="N"&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
-		
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
-
-		$api_result = curl_exec($this->ch);
-		
-		print $api_url;
-		die();
-		
+		$api_result = curl_exec($this->ch);		
 		$api_response = json_decode($api_result);
 		
 		return $api_response;
-		
 	}
 	
 	function create_case($case_data, $input_custom_attributes)
@@ -569,6 +562,18 @@ class apptivo_toolset
 		return json_decode($api_result);
 	}
 	
+	function update_lead($leadId, $attributeName, $leadData)
+	{
+		if(!$customer_data['segment_id']){$customer_data['segment_id'] = 'null';}
+	
+		$api_url = 'https://api.apptivo.com/app/dao/leads?a=updateLead&objectId=4&leadId='.$contactId.'&attributeName='.$attributeName.'&leadData='.$leadData.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		curl_setopt($this->ch, CURLOPT_URL, $api_url);
+		
+		$api_result = curl_exec($this->ch);
+		
+		return json_decode($api_result);
+	}
+	
 // Search Methods (later on should abstract these to be generic advanced search methods, right now search criteria is locked in)
 	function search_customers_by_name($customerName)
 	{
@@ -758,6 +763,17 @@ class apptivo_toolset
 		$this->caseStatusId = $api_response->caseStatus[0]->lookupId;
 		$this->casePriority = urlencode($api_response->casePriority[0]->meaning);
 		$this->casePriorityId = $api_response->casePriority[0]->lookupId;
+		
+		return $api_response;
+	}
+	
+	function get_leads_settings()
+	{
+		$api_url = 'https://api.apptivo.com/app/dao/leads?a=getLeadConfigData&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		curl_setopt($this->ch, CURLOPT_URL, $api_url);
+		
+		$api_result = curl_exec($this->ch);
+		$api_response = json_decode($api_result);
 		
 		return $api_response;
 	}
