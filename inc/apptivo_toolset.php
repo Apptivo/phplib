@@ -562,13 +562,13 @@ class apptivo_toolset
 		return json_decode($api_result);
 	}
 	
-	function update_lead($leadId, $attributeName, $leadData)
+	function update_lead($leadId, $attributeNames, $leadData)
 	{
 		if(!$customer_data['segment_id']){$customer_data['segment_id'] = 'null';}
 	
-		$api_url = 'https://api.apptivo.com/app/dao/leads?a=updateLead&objectId=4&leadId='.$contactId.'&attributeName='.$attributeName.'&leadData='.$leadData.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/leads?a=updateLead&objectId=4&leadId='.$leadId.'&attributeNames='.$attributeNames.'&leadData='.$leadData.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
-		
+
 		$api_result = curl_exec($this->ch);
 		
 		return json_decode($api_result);
