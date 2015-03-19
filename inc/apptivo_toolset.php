@@ -403,8 +403,6 @@ class apptivo_toolset
 		
 		$api_response = json_decode($api_result);
 		
-		print $api_url;
-		
 		if($api_response)
 		{
 			return 'Thank you, your submission has been received!';
@@ -623,7 +621,6 @@ class apptivo_toolset
 		{
 			$api_url = 'https://api.apptivo.com/app/dao/activities?a=getAllActivities&activityType=Task&isFromApp=home&sortColumn='.$sortColumn.'&sortDir='.$sortDir.'&objectStatus=0&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
 			curl_setopt($this->ch, CURLOPT_URL, $api_url);
-			print $api_url."<br><br>";
 					
 			$api_result = curl_exec($this->ch);
 			$api_response = json_decode($api_result);
@@ -634,16 +631,10 @@ class apptivo_toolset
 		function update_task($attributeName, $activityId, $taskData)
 		{
 		
-			$api_url = 'https://api.apptivo.com/app/dao/activities?a=updateTask&actType=home&activityId='.$activityId.'&attributeName=["'.$attributeName.'"]&taskData={"'.$attributeName.'":"'.$taskData.'"}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+			//$api_url = 'https://api.apptivo.com/app/dao/activities?a=updateTask&actType=home&activityId='.$activityId.'&attributeName=["'.$attributeName.'"]&taskData={"'.$attributeName.'":"'.$taskData.'"}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
 			
 			$api_url = 'https://api.apptivo.com/app/dao/activities?a=updateTask&actType=home&activityId='.$activityId.'&attributeName=["'.$attributeName.'"]&taskData='.$taskData.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
 			
-			
-			
-			print $api_url;
-			
-			
-			print '<br><br>';
 			
 			curl_setopt($this->ch, CURLOPT_URL, $api_url);
 			$api_result = curl_exec($this->ch);
@@ -678,9 +669,7 @@ class apptivo_toolset
 				$eventData['assigneeDetails'] = Array(
 					Array (
 						'objectId' => 8,
-						'objectRefId' => 18767,
-						'objectRefName' => urlencode('Kenny Clark'),
-						'objectName' => 'Employee'
+						'objectRefId' => 49462,
 					)
 				);
 			}
@@ -704,21 +693,14 @@ class apptivo_toolset
 			if(!$eventData['endTimeMinute']){$eventData['endTimeMinute'] = '00';}
 			if(!$eventData['endTimeMeridian']){$eventData['endTimeMeridian'] = 1;}		
 			
-			//This is the working example copied from web
-			//$api_url = 'https://api.apptivo.com/app/dao/activities?a=createEvent&actType=home&eventData=%7B%22activityTypeName%22:%22Appointment%22,%22sourceObjectId%22:%226%22,%22objectId%22:%226%22,%22objectRefId%22:null,%22subject%22:%22Lunch+with+Maxine%22,%22location%22:%22On+the+border%22,%22isBillable%22:%22Y%22,%22reminders%22:%5B%5D,%22isRemindMeEnabled%22:%22N%22,%22labels%22:%5B%5D,%22assigneeDetails%22:%5B%7B%22objectId%22:8,%22objectRefId%22:18767,%22objectRefName%22:%22Kenny+Clark%22,%22objectName%22:%22Employee%22%7D%5D,%22associatedObjects%22:%5B%7B%22objectId%22:2,%22objectRefId%22:797240,%22objectRefName%22:%22Maxine+Johnson%22,%22objectName%22:%22Contact%22%7D%5D,%22startDate%22:%2203%2F13%2F2015%22,%22endDate%22:%2203%2F13%2F2015%22,%22allDayEvent%22:%22N%22,%22startTimeHour%22:%2203%22,%22startTimeMinute%22:%2200%22,%22startTimeMeridian%22:1,%22endTimeHour%22:%2204%22,%22endTimeMinute%22:%2200%22,%22endTimeMeridian%22:1%7D&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
-
-
 			$api_url = 'https://api.apptivo.com/app/dao/activities?a=createEvent&actType=home&eventData='.json_encode($eventData).'&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
-			$api_url = str_replace('%2C',',',$api_url);
-			$api_url = str_replace('%3A',':',$api_url);
-			print $api_url.'<br><br>';
 			curl_setopt($this->ch, CURLOPT_URL, $api_url);
-			print $api_url."<br><br>";
-			
-			print_r($api_response);
-			
 			$api_result = curl_exec($this->ch);
 			$api_response = json_decode($api_result);
+			
+			print $api_url;
+			print_r($api_response);
+		
 		
 			return $api_response;
 		}
