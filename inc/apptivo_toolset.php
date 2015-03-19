@@ -412,7 +412,156 @@ class apptivo_toolset
 		
 	}
 	
-	function create_customer($customer_data, $input_phone_numbers, $input_addresses, $input_emails, $input_custom_attributes)
+	function create_contact($contactData, $input_phone_numbers, $input_addresses, $input_emails, $input_custom_attributes)
+	{
+		//Phone Numbers
+		if(Count($input_phone_numbers > 0))
+		{
+			$counter = 1;
+			foreach($input_phone_numbers as $cur_phone)
+			{
+				if($counter == 1)
+				{
+					$add_comma = '';
+					$counter_text = ''; //Don't change the ID for the first number, or else we get a blank field.
+				}else{
+					$add_comma = ',';
+					$counter_text = $counter;
+				}
+				$phone_numbers .= $add_comma.'{"phoneNumber":"'.$cur_phone['phoneNumber'].'","phoneTypeCode":"'.$cur_phone['phoneType'].'","phoneType":"'.$cur_phone['phoneType'].'","id":"contact_phone_input'.$counter_text.'"}';
+				$counter = $counter + 1;
+			}
+		}
+		
+		//Email Addresses
+		if(Count($input_emails > 0))
+		{
+			$counter = 1;
+			foreach($input_emails as $cur_email)
+			{
+				if($counter == 1)
+				{
+					$add_comma = '';
+					$counter_text = ''; //Don't change the ID for the first number, or else we get a blank field.
+				}else{
+					$add_comma = ',';
+					$counter_text = $counter;
+				}
+				$emails .= $add_comma.'{"emailAddress":"'.$cur_email['emailAddress'].'","emailType":"'.$cur_email['emailType'].'","emailTypeCode":"'.$cur_email['emailType'].'","id":"cont_email_input'.$counter_text.'"}';
+				$counter = $counter + 1;
+			}
+		}
+		
+		// Address fields
+		if(Count($input_addresses > 0))
+		{
+			$counter = 1;
+			foreach($input_addresses as $cur_addr)
+			{
+				$phone_type = explode(',', $cur_addr[0]);
+				if($counter == 1)
+				{
+					$add_comma = '';
+				}else{
+					$add_comma = ',';
+				}
+				$addresses .= $add_comma.'{"addressAttributeId":"address_section_attr_id'.$counter.'","addressTypeCode":"'.$cur_addr['addressTypeCode'].'","addressType":"'.$cur_addr['addressType'].'","addressLine1":"'.$cur_addr['addressLine1'].'","addressLine2":"'.$cur_addr['addressLine2'].'","city":"'.$cur_addr['city'].'","stateCode":"'.$cur_addr['stateCode'].'","state":"'.$cur_addr['state'].'","zipCode":"'.$cur_addr['zipCode'].'","countryId":'.$cur_addr['countryId'].',"countryName":"'.$cur_addr['countryName'].'"}';
+				$counter = $counter + 1;
+			}
+		}
+		
+		//Check to see if we passed in an array of custom attributes.  This array contains one or more attributes, and each attribute should have 3 values comma separated (attribute type, attribute id, attribute value)
+		if(Count($input_custom_attributes > 0))
+		{
+			$counter = 1;
+			foreach($input_custom_attributes as $cur_attr)
+			{
+				if($counter == 1)
+				{
+					$add_comma = '';
+				}else{
+					$add_comma = ',';
+				}
+				$custom_attr .= $add_comma.'{"customAttributeType":"'.$cur_attr['customAttributeType'].'","id":"'.$cur_attr['id'].'","customAttributeName":"'.$cur_attr['id'].'","customAttributeId":"'.$cur_attr['id'].'","customAttributeValue":"'.$cur_attr['customAttributeValue'].'"}';
+				$counter = $counter + 1;
+			}
+		}
+		
+		// These are mandatory fields that we cannot set a default for.  You must pass in these fields, or we'll return an error message.
+		$required_fields = Array('assigneeObjectRefId','assigneeObjectRefName','lastName');
+		foreach ($required_fields as $cur_field)
+		{
+			if(!$contactData[$cur_field])
+			{
+				$form_message .= 'Error: '.$cur_field.' is empty.  This is a required field.  Please report this error to the website admin.<br />';
+			}
+		}
+		
+		// If we missed any required fields, $form_message will contain the errors.  Check for value and just return the message & exit if one is found.
+		if($form_message)
+		{
+			return $form_message;
+		}
+		
+		// Some attributes require a value.  But a0re not commonly used.  We'll check if a value as given, if not set to a default
+
+		
+		// Some attributes need to have "null" passed in, if there is no value.  We'll check if a value was given, if not set to null.
+		if(!$contactData['campaignId']){$contactData['campaignId'] = 'null';}
+		if(!$contactData['territoryId']){$contactData['territoryId'] = 'null';}
+		if(!$contactData['accountId']){$contactData['accountId'] = 'null';}
+		if(!$contactData['marketId']){$contactData['marketId'] = 'null';}
+		if(!$contactData['marketName']){$contactData['marketName'] = 'null';}
+		if(!$contactData['segment_id']){$contactData['segment_id'] = 'null';}
+		if(!$contactData['segmentName']){$contactData['segmentName'] = 'null';}
+		if(!$contactData['followUpDate']){$contactData['followUpDate'] = 'null';}
+		if(!$contactData['followUpDescription']){$contactData['followUpDescription'] = 'null';}
+		
+		//These are required values, but the ID numbers change from firm to firm.  We'll use a default of one exists, or get a new one now.
+		if(!$contactData['contactTypeName']){
+			if($this->contactTypeName){
+				$contactData['contactTypeName'] = $this->contactTypeName;
+			}else{
+				$this->get_contacts_settings();
+				$contactData['contactTypeName'] = $this->contactTypeName;
+			}
+		}
+		if(!$contactData['contactType']){
+			if($this->contactType){
+				$contactData['contactType'] = $this->contactType;
+			}else{
+				$this->get_contacts_settings();
+				$contactData['contactType'] = $this->contactType;
+			}
+		}
+		
+		//if(!$addresses){$addresses = '{"addressAttributeId":"address_section_attr_id","addressTypeCode":"1","addressType":"Billing+Address","addressLine1":"","addressLine2":"","city":"","stateCode":"","zipCode":"","countryId":176,"countryName":"United+States","deliveryInstructions":""}';}
+		
+		/* These are other possible values that could be passed in
+			$contactData['skypeName']
+			$contactData['campaignName']
+			$contactData['territoryName']
+			$contactData['lastUpdatedByName']
+			$contactData['createdByName']
+			$contactData['lastUpdateDate']
+			$contactData['creationDate']
+			$contactData['industry']
+			$contactData['industryName']
+			$contactData['faceBookURL']
+			$contactData['twitterURL']
+			$contactData['linkedInURL']
+		*/
+		 
+		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=saveContact&isNewCustomer=&contactData={"title":null,"":"","firstName":"'.$contactData['firstName'].'","lastName":"'.$contactData['lastName'].'","jobTitle":"","contactTypeName":"'.$contactData['contactTypeName'].'","contactType":"'.$contactData['contactType'].'","accountName":"'.$contactData['accountName'].'","accountId":'.$contactData['accountId'].',"supplierName":"","supplierId":null,"assigneeObjectRefName":"'.$contactData['assigneeObjectRefName'].'","assigneeObjectRefId":'.$contactData['assigneeObjectRefId'].',"assigneeObjectId":8,"contactCategoryName":"","categoryId":null,"description":"","phoneNumber":"'.$contactData['phoneNumber'].'","contactEmail":"'.$contactData['contactEmail'].'","skypeName":"","languageName":null,"languageCode":null,"phoneticName":"","nickName":"","dateOfBirth":"","marketName":"","marketId":null,"segmentName":"","segmentId":null,"territoryName":"","territoryId":null,"industryName":"","industryId":null,"followUpDate":null,"followUpDescription":null,"createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","hobbies":"","foods":"","faceBookURL":"","twitterURL":"","linkedInURL":"","website":"","section_1423271450718_1343_attribute_radio_1423271792653_2867":"No","phoneNumbers":['.$phone_numbers.'],"emailAddresses":[{"emailAddress":"'.$contactData['contactEmail'].'","emailTypeCode":"BUSINESS","emailType":"Business","id":"cont_email_input"}],"searchColumn":"","addresses":['.$addresses.'],"labels":[],"customAttributes":['.$custom_attr.'],"createdBy":null,"lastUpdatedBy":null,"contactCategoryIds":[],"categories":[],"isNewCustomer":"","syncToGoogle":"Y"}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+				
+		curl_setopt($this->ch, CURLOPT_URL, $api_url);
+
+		$api_result = curl_exec($this->ch);
+
+		return json_decode($api_result);
+	}
+	
+	function create_customer($customerData, $input_phone_numbers, $input_addresses, $input_emails, $input_custom_attributes)
 	{
 		//Phone Numbers
 		if(Count($input_phone_numbers > 0))
@@ -491,7 +640,7 @@ class apptivo_toolset
 		$required_fields = Array('assigneeObjectRefId','assigneeObjectRefName','customerNumber','customerName');
 		foreach ($required_fields as $cur_field)
 		{
-			if(!$customer_data[$cur_field])
+			if(!$customerData[$cur_field])
 			{
 				$form_message .= 'Error: '.$cur_field.' is empty.  This is a required field.  Please report this error to the website admin.<br />';
 			}
@@ -507,51 +656,67 @@ class apptivo_toolset
 
 		
 		// Some attributes need to have "null" passed in, if there is no value.  We'll check if a value was given, if not set to null.
-		if(!$customer_data['campaignId']){$customer_data['campaignId'] = 'null';}
-		if(!$customer_data['territoryId']){$customer_data['territoryId'] = 'null';}
-		if(!$customer_data['marketId']){$customer_data['marketId'] = 'null';}
-		if(!$customer_data['marketName']){$customer_data['marketName'] = 'null';}
-		if(!$customer_data['segment_id']){$customer_data['segment_id'] = 'null';}
-		if(!$customer_data['segmentName']){$customer_data['segmentName'] = 'null';}
-		if(!$customer_data['followUpDate']){$customer_data['followUpDate'] = 'null';}
-		if(!$customer_data['followUpDescription']){$customer_data['followUpDescription'] = 'null';}
-		if(!$customer_data['employeeRangeId']){$customer_data['employeeRangeId'] = 'null';}
-		if(!$customer_data['employeeRange']){$customer_data['employeeRange'] = 'null';}
-		if(!$customer_data['annualRevenue']){$customer_data['annualRevenue'] = 'null';}
+		if(!$customerData['campaignId']){$customerData['campaignId'] = 'null';}
+		if(!$customerData['territoryId']){$customerData['territoryId'] = 'null';}
+		if(!$customerData['customerCategoryId']){$customerData['customerCategoryId'] = 'null';}
+		if(!$customerData['marketId']){$customerData['marketId'] = 'null';}
+		if(!$customerData['marketName']){$customerData['marketName'] = 'null';}
+		if(!$customerData['segment_id']){$customerData['segment_id'] = 'null';}
+		if(!$customerData['segmentName']){$customerData['segmentName'] = 'null';}
+		if(!$customerData['followUpDate']){$customerData['followUpDate'] = 'null';}
+		if(!$customerData['followUpDescription']){$customerData['followUpDescription'] = 'null';}
+		if(!$customerData['employeeRangeId']){$customerData['employeeRangeId'] = 'null';}
+		if(!$customerData['employeeRange']){$customerData['employeeRange'] = 'null';}
+		if(!$customerData['annualRevenue']){$customerData['annualRevenue'] = 'null';}
 		
+		//These are required values, but the ID numbers change from firm to firm.  We'll use a default of one exists, or get a new one now.
+		if(!$customerData['paymentTerm']){
+			if($this->paymentTerm){
+				$customerData['paymentTerm'] = $this->paymentTerm;
+			}else{
+				$this->get_customers_settings();
+				$customerData['paymentTerm'] = $this->paymentTerm;
+			}
+		}
+		if(!$customerData['paymentTermId']){
+			if($this->paymentTermId){
+				$customerData['paymentTermId'] = $this->paymentTermId;
+			}else{
+				$this->get_customers_settings();
+				$customerData['paymentTermId'] = $this->paymentTermId;
+			}
+		}
+
 		//if(!$addresses){$addresses = '{"addressAttributeId":"address_section_attr_id","addressTypeCode":"1","addressType":"Billing+Address","addressLine1":"","addressLine2":"","city":"","stateCode":"","zipCode":"","countryId":176,"countryName":"United+States","deliveryInstructions":""}';}
 		
 		/* These are other possible values that could be passed in
-			$customer_data['skypeName']
-			$customer_data['estimatedCloseDate']
-			$customer_data['campaignName']
-			$customer_data['territoryName']
-			$customer_data['lastUpdatedByName']
-			$customer_data['createdByName']
-			$customer_data['lastUpdateDate']
-			$customer_data['creationDate']
-			$customer_data['industry']
-			$customer_data['industryName']
-			$customer_data['ownership']
-			$customer_data['website']
-			$customer_data['faceBookURL']
-			$customer_data['twitterURL']
-			$customer_data['linkedInURL']
+			$customerData['skypeName']
+			$customerData['estimatedCloseDate']
+			$customerData['campaignName']
+			$customerData['territoryName']
+			$customerData['lastUpdatedByName']
+			$customerData['createdByName']
+			$customerData['lastUpdateDate']
+			$customerData['creationDate']
+			$customerData['industry']
+			$customerData['industryName']
+			$customerData['ownership']
+			$customerData['website']
+			$customerData['faceBookURL']
+			$customerData['twitterURL']
+			$customerData['linkedInURL']
 		*/
 		 
-		$api_url = 'https://api.apptivo.com/app/dao/customers?a=createCustomer&customerData={"customerName":"'.$customer_data['customerName'].'","customerNumber":"'.$customer_data['customerNumber'].'","customerCategory":"'.$customer_data['customerCategory'].'","customerCategoryId":"'.$customer_data['customerCategoryId'].'","assigneeObjectRefName":"'.$customer_data['assigneeObjectRefName'].'","assigneeObjectId":8,"assigneeObjectRefId":'.$customer_data['assigneeObjectRefId'].',"description":"","phoneNumber":"","contactEmail":"","skypeName":"","parentCustomerName":"","parentCustomerId":null,"employeeRange":"","employeeRangeId":null,"website":"","tickerSymbol":"","annualRevenue":null,"campaignName":"","campaignId":null,"creditRating":"","marketName":"","marketId":null,"segmentName":"","segmentId":null,"territoryName":"","territoryId":null,"industryName":"","industryId":null,"paymentTerm":"Immediate","paymentTermId":"'.$customer_data['paymentTermId'].'","ownership":"","slaName":"","slaId":null,"followUpDate":null,"followUpDescription":null,"createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","isExistingCustomer":"N","isAffiliate":"N","faceBookURL":"","twitterURL":"","linkedInURL":"","phoneNumbers":['.$phone_numbers.'],"emailAddresses":['.$emails.'],"searchColumn":"'.$customer_data['customerName'].'","addresses":['.$addresses.'],"labels":[],"customAttributes":['.$custom_attr.'],"customerId":null,"createdBy":null,"lastUpdatedBy":null}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
-				
+		$api_url = 'https://api.apptivo.com/app/dao/customers?a=createCustomer&customerData={"customerName":"'.$customerData['customerName'].'","customerNumber":"'.$customerData['customerNumber'].'","customerCategory":"'.$customerData['customerCategory'].'","customerCategoryId":'.$customerData['customerCategoryId'].',"":"","assigneeObjectRefName":"'.$customerData['assigneeObjectRefName'].'","assigneeObjectId":8,"assigneeObjectRefId":'.$customerData['assigneeObjectRefId'].',"phoneNumber":"","contactEmail":"'.$customerData['contactEmail'].'","section_1423271450718_1343_attribute_checkbox_1423272399478_5351":"N","parentCustomerName":"","parentCustomerId":null,"employeeRange":"","employeeRangeId":null,"website":"","tickerSymbol":"","annualRevenue":null,"campaignName":"","campaignId":null,"creditRating":"","marketName":"","marketId":null,"segmentName":"","segmentId":null,"industryName":"","industryId":null,"territoryName":"","territoryId":null,"paymentTerm":"'.$customerData['paymentTerm'].'","paymentTermId":"'.$customerData['paymentTermId'].'","ownership":"","slaName":"","slaId":null,"followUpDate":null,"followUpDescription":null,"description":"","createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","isExistingCustomer":"N","isAffiliate":"N","faceBookURL":"","twitterURL":"","linkedInURL":"","phoneNumbers":['.$phone_numbers.'],"emailAddresses":[{"emailAddress":"'.$customerData['contactEmail'].'","emailTypeCode":"BUSINESS","emailType":"Business","id":"cont_email_input"}],"searchColumn":"","addresses":[{"addressAttributeId":"address_section_attr_id","addressTypeCode":"1","addressType":"Billing+Address","addressLine1":"","addressLine2":"","city":"","stateCode":"","zipCode":"","countryId":176,"countryName":"United+States","deliveryInstructions":""}],"labels":[],"customAttributes":['.$custom_attr.'],"customerId":null,"createdBy":null,"lastUpdatedBy":null}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;	
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
-
 		$api_result = curl_exec($this->ch);
 		
 		return json_decode($api_result);
 	}
+	
 // Update Methods
 	function update_contact($contactId, $attributeName, $contactData)
 	{
-		if(!$customer_data['segment_id']){$customer_data['segment_id'] = 'null';}
-	
 		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=updateContact&objectId=2&contactId='.$contactId.'&attributeName='.$attributeName.'&contactData='.$contactData.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		
@@ -562,12 +727,21 @@ class apptivo_toolset
 	
 	function update_lead($leadId, $attributeNames, $leadData)
 	{
-		if(!$customer_data['segment_id']){$customer_data['segment_id'] = 'null';}
-	
 		$api_url = 'https://api.apptivo.com/app/dao/leads?a=updateLead&objectId=4&leadId='.$leadId.'&attributeNames='.$attributeNames.'&leadData='.$leadData.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 
 		$api_result = curl_exec($this->ch);
+		
+		return json_decode($api_result);
+	}
+	
+	function update_opportunity($opportunityId, $attributeNames, $opportunityData) {
+		$api_url = 'https://api.apptivo.com/app/dao/opportunities?a=updateOpportunity&objectId=11&opportunityId='.$opportunityId.'&attributeName='.$attributeNames.'&opportunityData='.$opportunityData.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		curl_setopt($this->ch, CURLOPT_URL, $api_url);
+
+		$api_result = curl_exec($this->ch);
+		
+		print $api_url;
 		
 		return json_decode($api_result);
 	}
@@ -614,6 +788,15 @@ class apptivo_toolset
 		$api_result = curl_exec($this->ch);
 		return json_decode($api_result);
 	}
+
+	function search_contacts_by_name($firstName,$lastName)
+	{
+		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=getAllContactsByAdvancedSearch&objectId=2&startIndex=0&numRecords=250&sortColumn=_score&sortDir=asc&searchData={"title":null,"":"","firstName":"'.$firstName.'","lastName":"'.$lastName.'","phoneType":"-1","phoneNumber":"","emailType":"-1","contactEmail":"","jobTitle":"","accountName":"","accountId":null,"assigneeObjectRefName":null,"assigneeObjectId":null,"assigneeObjectRefId":null,"contactCategoryName":"","description":"","territoryName":"","territoryId":null,"createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","dateOfBirth":"","dateOfBirthTo":"","faceBookURL":"","twitterURL":"","linkedInURL":"","website":"","syncToGoogle":null,"categories":[],"phoneNumbers":[{"phoneNumber":"","phoneType":"'.urlencode('Select One').'","phoneTypeCode":"-1","id":"contact_phone_input"}],"emailAddresses":[{"emailAddress":"'.$contactEmail.'","emailTypeCode":"-1","emailType":"","id":"cont_email_input"}],"searchColumn":"","addresses":[{"addressAttributeId":"addressAttributeId_1426661106713_7286","addressType":"","addressLine1":"","addressLine2":"","city":"","stateCode":"","state":"","zipCode":"","countryId":-1,"countryName":"'.urlencode('Select One').'"}],"labels":[],"customAttributes":[]}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		curl_setopt($this->ch, CURLOPT_URL, $api_url);
+		$api_result = curl_exec($this->ch);
+		return json_decode($api_result);
+	}
+
 	
 //  Activity Management
 	//Tasks Object
@@ -683,24 +866,22 @@ class apptivo_toolset
 					)
 				);
 			}
-			if(!$eventData['startDate']){$eventData['startDate'] = urlencode('03/19/2015');}
-			if(!$eventData['endDate']){$eventData['endDate'] = urlencode('03/19/2015');}
-			if(!$eventData['allDayEvent']){$eventData['allDayEvent'] = 'N';}
-			if(!$eventData['startTimeHour']){$eventData['startTimeHour'] = '03';}
-			if(!$eventData['startTimeMinute']){$eventData['startTimeMinute'] = '00';}
-			if(!$eventData['startTimeMeridian']){$eventData['startTimeMeridian'] = 1;}
-			if(!$eventData['endTimeHour']){$eventData['endTimeHour'] = '04';}
-			if(!$eventData['endTimeMinute']){$eventData['endTimeMinute'] = '00';}
-			if(!$eventData['endTimeMeridian']){$eventData['endTimeMeridian'] = 1;}		
+			
+			// These are mandatory fields that we cannot set a default for.  You must pass in these fields, or we'll return an error message.
+			$required_fields = Array('startDate','endDate','startTimeHour','startTimeMinute','endTimeHour','endTimeMinute');
+			foreach ($required_fields as $cur_field)
+			{
+				if(!$eventData[$cur_field])
+				{
+					print 'Error: '.$cur_field.' is empty.  This is a required field.  Please report this error to the website admin.<br />';
+					return 'Error: '.$cur_field.' is empty.  This is a required field.  Please report this error to the website admin.<br />';
+				}
+			}
 			
 			$api_url = 'https://api.apptivo.com/app/dao/activities?a=createEvent&actType=home&eventData='.json_encode($eventData).'&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
 			curl_setopt($this->ch, CURLOPT_URL, $api_url);
 			$api_result = curl_exec($this->ch);
-			$api_response = json_decode($api_result);
-			
-			print $api_url;
-			print_r($api_response);
-		
+			$api_response = json_decode($api_result);	
 		
 			return $api_response;
 		}
@@ -745,6 +926,36 @@ class apptivo_toolset
 		$this->caseStatusId = $api_response->caseStatus[0]->lookupId;
 		$this->casePriority = urlencode($api_response->casePriority[0]->meaning);
 		$this->casePriorityId = $api_response->casePriority[0]->lookupId;
+		
+		return $api_response;
+	}
+
+	function get_customers_settings()
+	{
+		$api_url = 'https://api.apptivo.com/app/dao/customers?a=getAllCustomerConfigData&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		curl_setopt($this->ch, CURLOPT_URL, $api_url);
+
+		$api_result = curl_exec($this->ch);
+		$api_response = json_decode($api_result);
+		
+		//Take the required fields and grab the first value to set as default
+		$this->paymentTermId = $api_response->paymentTerms[0]->paymentTermId;
+		$this->paymentTerm = urlencode($api_response->paymentTerms[0]->paymentTermCode);
+		
+		return $api_response;
+	}
+	
+	function get_contacts_settings()
+	{
+		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=getAllContactConfigData&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		curl_setopt($this->ch, CURLOPT_URL, $api_url);
+
+		$api_result = curl_exec($this->ch);
+		$api_response = json_decode($api_result);
+		
+		//Take the required fields and grab the first value to set as default
+		$this->contactType = $api_response->contactTypes[0]->contactTypeId;
+		$this->contactTypeName = urlencode($api_response->contactTypes[0]->contactType);
 		
 		return $api_response;
 	}
