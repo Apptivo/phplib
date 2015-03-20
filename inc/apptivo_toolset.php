@@ -7,6 +7,7 @@ class apptivo_toolset
 {
 	public $api_key = 'null';
 	public $access_key = 'null';
+	public $user_name_str = 'null';
 	public $ch;
 	
 	public $caseType;
@@ -19,7 +20,7 @@ class apptivo_toolset
 // Get All Methods: Read All Contacts, etc
 	function get_all_contacts($startIndex)
 	{
-		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=getAllContacts&startIndex='.$startIndex.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=getAllContacts&startIndex='.$startIndex.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);
 		return json_decode($api_result);		
@@ -28,7 +29,7 @@ class apptivo_toolset
 // Get by ID Methods: Get Contact By ID, Get Customer By ID, Get Case By ID, etc.
 	function get_contact_by_id($contact_id)
 	{
-		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=getContactByContactId&contactId='.$contact_id.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=getContactByContactId&contactId='.$contact_id.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);
 		return json_decode($api_result);	
@@ -174,7 +175,7 @@ class apptivo_toolset
 			$lead_data['linkedInURL']
 		*/
 			
-		$api_url = 'https://api.apptivo.com/app/dao/leads?a=createLead&leadData={"title":"'.$lead_data['title'].'","firstName":"'.$lead_data['firstName'].'","lastName":"'.$lead_data['lastName'].'","jobTitle":"'.$lead_data['jobTitle'].'","easyWayToContact":"'.$lead_data['easyWayToContact'].'","wayToContact":"'.$lead_data['wayToContact'].'","leadStatus":'.$lead_data['leadStatus'].',"leadStatusMeaning":"'.$lead_data['leadStatusMeaning'].'","leadSource":'.$lead_data['leadSource'].',"leadSourceMeaning":"'.$lead_data['leadSourceMeaning'].'","leadTypeName":"'.$lead_data['leadTypeName'].'","leadTypeId":'.$lead_data['leadTypeId'].',"referredByName":"'.$lead_data['referredByName'].'","referredById":'.$lead_data['referredById'].',"assigneeObjectRefName":"'.$lead_data['assigneeObjectRefName'].'","assigneeObjectRefId":'.$lead_data['assigneeObjectRefId'].',"assigneeObjectId":8,"description":"'.$lead_data['description'].'","skypeName":"'.$lead_data['skypeName'].'","potentialAmount":'.$lead_data['potentialAmount'].',"currencyCode":"'.$lead_data['currencyCode'].'","estimatedCloseDate":"'.$lead_data['estimatedCloseDate'].'","leadRank":'.$lead_data['leadRank'].',"leadRankMeaning":"'.$lead_data['leadRankMeaning'].'","campaignName":"'.$lead_data['campaignName'].'","campaignId":'.$lead_data['campaignId'].',"territoryName":"'.$lead_data['territoryName'].'","territoryId":'.$lead_data['territoryId'].',"marketId":'.$lead_data['marketId'].',"marketName":'.$lead_data['marketName'].',"segmentId":'.$lead_data['segment_id'].',"segmentName":'.$lead_data['segmentName'].',"followUpDate":'.$lead_data['followUpDate'].',"followUpDescription":'.$lead_data['followUpDescription'].',"createdByName":"'.$lead_data['createdByName'].'","lastUpdatedByName":"'.$lead_data['lastUpdatedByName'].'","creationDate":"'.$lead_data['creationDate'].'","lastUpdateDate":"'.$lead_data['lastUpdateDate'].'","accountName":"'.$lead_data['accountName'].'","accountId":'.$lead_data['accountId'].',"companyName":"'.$lead_data['companyName'].'","employeeRangeId":'.$lead_data['employeeRangeId'].',"employeeRange":"'.$lead_data['employeeRange'].'","annualRevenue":'.$lead_data['annualRevenue'].',"industry":"'.$lead_data['industry'].'","industryName":"'.$lead_data['industryName'].'","ownership":"'.$lead_data['ownership'].'","website":"'.$lead_data['website'].'","faceBookURL":"'.$lead_data['faceBookURL'].'","twitterURL":"'.$lead_data['twitterURL'].'","linkedInURL":"'.$lead_data['linkedInURL'].'","phoneNumbers":['.$phone_numbers.'],"addresses":['.$addresses.'],"emailAddresses":['.$emails.'],"labels":[],"customAttributes":['.$custom_attr.'],"createdBy":null,"lastUpdatedBy":null}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/leads?a=createLead&leadData={"title":"'.$lead_data['title'].'","firstName":"'.$lead_data['firstName'].'","lastName":"'.$lead_data['lastName'].'","jobTitle":"'.$lead_data['jobTitle'].'","easyWayToContact":"'.$lead_data['easyWayToContact'].'","wayToContact":"'.$lead_data['wayToContact'].'","leadStatus":'.$lead_data['leadStatus'].',"leadStatusMeaning":"'.$lead_data['leadStatusMeaning'].'","leadSource":'.$lead_data['leadSource'].',"leadSourceMeaning":"'.$lead_data['leadSourceMeaning'].'","leadTypeName":"'.$lead_data['leadTypeName'].'","leadTypeId":'.$lead_data['leadTypeId'].',"referredByName":"'.$lead_data['referredByName'].'","referredById":'.$lead_data['referredById'].',"assigneeObjectRefName":"'.$lead_data['assigneeObjectRefName'].'","assigneeObjectRefId":'.$lead_data['assigneeObjectRefId'].',"assigneeObjectId":8,"description":"'.$lead_data['description'].'","skypeName":"'.$lead_data['skypeName'].'","potentialAmount":'.$lead_data['potentialAmount'].',"currencyCode":"'.$lead_data['currencyCode'].'","estimatedCloseDate":"'.$lead_data['estimatedCloseDate'].'","leadRank":'.$lead_data['leadRank'].',"leadRankMeaning":"'.$lead_data['leadRankMeaning'].'","campaignName":"'.$lead_data['campaignName'].'","campaignId":'.$lead_data['campaignId'].',"territoryName":"'.$lead_data['territoryName'].'","territoryId":'.$lead_data['territoryId'].',"marketId":'.$lead_data['marketId'].',"marketName":'.$lead_data['marketName'].',"segmentId":'.$lead_data['segment_id'].',"segmentName":'.$lead_data['segmentName'].',"followUpDate":'.$lead_data['followUpDate'].',"followUpDescription":'.$lead_data['followUpDescription'].',"createdByName":"'.$lead_data['createdByName'].'","lastUpdatedByName":"'.$lead_data['lastUpdatedByName'].'","creationDate":"'.$lead_data['creationDate'].'","lastUpdateDate":"'.$lead_data['lastUpdateDate'].'","accountName":"'.$lead_data['accountName'].'","accountId":'.$lead_data['accountId'].',"companyName":"'.$lead_data['companyName'].'","employeeRangeId":'.$lead_data['employeeRangeId'].',"employeeRange":"'.$lead_data['employeeRange'].'","annualRevenue":'.$lead_data['annualRevenue'].',"industry":"'.$lead_data['industry'].'","industryName":"'.$lead_data['industryName'].'","ownership":"'.$lead_data['ownership'].'","website":"'.$lead_data['website'].'","faceBookURL":"'.$lead_data['faceBookURL'].'","twitterURL":"'.$lead_data['twitterURL'].'","linkedInURL":"'.$lead_data['linkedInURL'].'","phoneNumbers":['.$phone_numbers.'],"addresses":['.$addresses.'],"emailAddresses":['.$emails.'],"labels":[],"customAttributes":['.$custom_attr.'],"createdBy":null,"lastUpdatedBy":null}&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 
@@ -289,7 +290,7 @@ class apptivo_toolset
 			$opportunity_data['dateResolved']
 		*/
 			
-		$api_url = 'https://api.apptivo.com/app/dao/opportunities?a=createOpportunity&opportunityData={"opportunityName":"'.$opportunity_data['opportunityName'].'","salesStageName":"'.$opportunity_data['salesStageName'].'","salesStageId":"'.$opportunity_data['salesStageId'].'","":"","opportunityCustomer":"'.$opportunity_data['opportunityCustomer'].'","opportunityCustomerId":'.$opportunity_data['opportunityCustomerId'].',"probability":"'.$opportunity_data['probability'].'","opportunityContact":"'.$opportunity_data['opportunityContact'].'","opportunityContactId":'.$opportunity_data['opportunityContactId'].',"opportunityTypeName":"'.$opportunity_data['opportunityTypeName'].'","opportunityTypeId":"'.$opportunity_data['opportunityTypeId'].'","leadSourceTypeName":"'.$opportunity_data['leadSourceTypeName'].'","leadSourceTypeId":"'.$opportunity_data['leadSourceTypeId'].'","closeDate":"'.$opportunity_data['closeDate'].'","nextStep":"","assignedToObjectRefName":"'.$opportunity_data['assignedToObjectRefName'].'","assignedToObjectId":8,"assignedToObjectRefId":'.$opportunity_data['assignedToObjectRefId'].',"amount":0,"currencyCode":"USD","campaignName":"","campaignId":null,"description":"","followUpDate":null,"followUpDescription":null,"createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","marketName":"","marketId":null,"segmentName":"","segmentId":null,"territoryName":"'.$opportunity_data['territoryName'].'","territoryId":'.$opportunity_data['territoryId'].',"section_1423271450718_1343_attribute_radio_1423271792653_2867":"No","searchColumn":"'.$opportunity_data['searchColumn'].'","addresses":[],"customAttributes":['.$custom_attr.'],"labels":[],"opportunityId":null,"createdBy":null,"lastUpdatedBy":null,"isMultiCurrency":"Y"}&fromObjectId=null&fromObjectRefId=null&isDuplicate="N"&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/opportunities?a=createOpportunity&opportunityData={"opportunityName":"'.$opportunity_data['opportunityName'].'","salesStageName":"'.$opportunity_data['salesStageName'].'","salesStageId":"'.$opportunity_data['salesStageId'].'","":"","opportunityCustomer":"'.$opportunity_data['opportunityCustomer'].'","opportunityCustomerId":'.$opportunity_data['opportunityCustomerId'].',"probability":"'.$opportunity_data['probability'].'","opportunityContact":"'.$opportunity_data['opportunityContact'].'","opportunityContactId":'.$opportunity_data['opportunityContactId'].',"opportunityTypeName":"'.$opportunity_data['opportunityTypeName'].'","opportunityTypeId":"'.$opportunity_data['opportunityTypeId'].'","leadSourceTypeName":"'.$opportunity_data['leadSourceTypeName'].'","leadSourceTypeId":"'.$opportunity_data['leadSourceTypeId'].'","closeDate":"'.$opportunity_data['closeDate'].'","nextStep":"","assignedToObjectRefName":"'.$opportunity_data['assignedToObjectRefName'].'","assignedToObjectId":8,"assignedToObjectRefId":'.$opportunity_data['assignedToObjectRefId'].',"amount":0,"currencyCode":"USD","campaignName":"","campaignId":null,"description":"","followUpDate":null,"followUpDescription":null,"createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","marketName":"","marketId":null,"segmentName":"","segmentId":null,"territoryName":"'.$opportunity_data['territoryName'].'","territoryId":'.$opportunity_data['territoryId'].',"section_1423271450718_1343_attribute_radio_1423271792653_2867":"No","searchColumn":"'.$opportunity_data['searchColumn'].'","addresses":[],"customAttributes":['.$custom_attr.'],"labels":[],"opportunityId":null,"createdBy":null,"lastUpdatedBy":null,"isMultiCurrency":"Y"}&fromObjectId=null&fromObjectRefId=null&isDuplicate="N"&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);		
 		$api_response = json_decode($api_result);
@@ -394,7 +395,7 @@ class apptivo_toolset
 			$case_data['dateResolved']
 		*/
 			
-		$api_url = 'https://api.apptivo.com/app/dao/case?a=createCase&caseData={"caseNumber":"'.$case_data['caseNumber'].'","caseStatus":"'.$case_data['caseStatus'].'","caseStatusId":"'.$case_data['caseStatusId'].'","caseType":"'.$case_data['caseType'].'","caseTypeId":"'.$case_data['caseTypeId'].'","casePriority":"'.$case_data['casePriority'].'","casePriorityId":"'.$case_data['casePriorityId'].'","assignedObjectRefName":"'.$case_data['assignedObjectRefName'].'","assignedObjectId":"'.$case_data['assignedObjectId'].'","assignedObjectRefId":"'.$case_data['assignedObjectRefId'].'","caseSummary":"'.$case_data['caseSummary'].'","description":"'.$case_data['description'].'","caseItem":"'.$case_data['caseItem'].'","caseItemId":'.$case_data['caseItemId'].',"needByDate":"'.$case_data['needByDate'].'","caseProject":"'.$case_data['caseProject'].'","caseProjectId":'.$case_data['caseProjectId'].',"dateResolved":"'.$case_data['dateResolved'].'","caseCustomer":"'.$case_data['caseCustomer'].'","caseCustomerId":'.$case_data['caseCustomerId'].',"caseContact":"'.$case_data['caseContact'].'","caseContactId":'.$case_data['caseContactId'].',"caseEmail":"'.$case_data['caseEmail'].'","customAttributes":['.$custom_attr.']}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/case?a=createCase&caseData={"caseNumber":"'.$case_data['caseNumber'].'","caseStatus":"'.$case_data['caseStatus'].'","caseStatusId":"'.$case_data['caseStatusId'].'","caseType":"'.$case_data['caseType'].'","caseTypeId":"'.$case_data['caseTypeId'].'","casePriority":"'.$case_data['casePriority'].'","casePriorityId":"'.$case_data['casePriorityId'].'","assignedObjectRefName":"'.$case_data['assignedObjectRefName'].'","assignedObjectId":"'.$case_data['assignedObjectId'].'","assignedObjectRefId":"'.$case_data['assignedObjectRefId'].'","caseSummary":"'.$case_data['caseSummary'].'","description":"'.$case_data['description'].'","caseItem":"'.$case_data['caseItem'].'","caseItemId":'.$case_data['caseItemId'].',"needByDate":"'.$case_data['needByDate'].'","caseProject":"'.$case_data['caseProject'].'","caseProjectId":'.$case_data['caseProjectId'].',"dateResolved":"'.$case_data['dateResolved'].'","caseCustomer":"'.$case_data['caseCustomer'].'","caseCustomerId":'.$case_data['caseCustomerId'].',"caseContact":"'.$case_data['caseContact'].'","caseContactId":'.$case_data['caseContactId'].',"caseEmail":"'.$case_data['caseEmail'].'","customAttributes":['.$custom_attr.']}&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 
 		
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
@@ -552,7 +553,7 @@ class apptivo_toolset
 			$contactData['linkedInURL']
 		*/
 		 
-		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=saveContact&isNewCustomer=&contactData={"title":null,"":"","firstName":"'.$contactData['firstName'].'","lastName":"'.$contactData['lastName'].'","jobTitle":"","contactTypeName":"'.$contactData['contactTypeName'].'","contactType":"'.$contactData['contactType'].'","accountName":"'.$contactData['accountName'].'","accountId":'.$contactData['accountId'].',"supplierName":"","supplierId":null,"assigneeObjectRefName":"'.$contactData['assigneeObjectRefName'].'","assigneeObjectRefId":'.$contactData['assigneeObjectRefId'].',"assigneeObjectId":8,"contactCategoryName":"","categoryId":null,"description":"","phoneNumber":"'.$contactData['phoneNumber'].'","contactEmail":"'.$contactData['contactEmail'].'","skypeName":"","languageName":null,"languageCode":null,"phoneticName":"","nickName":"","dateOfBirth":"","marketName":"","marketId":null,"segmentName":"","segmentId":null,"territoryName":"","territoryId":null,"industryName":"","industryId":null,"followUpDate":null,"followUpDescription":null,"createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","hobbies":"","foods":"","faceBookURL":"","twitterURL":"","linkedInURL":"","website":"","section_1423271450718_1343_attribute_radio_1423271792653_2867":"No","phoneNumbers":['.$phone_numbers.'],"emailAddresses":[{"emailAddress":"'.$contactData['contactEmail'].'","emailTypeCode":"BUSINESS","emailType":"Business","id":"cont_email_input"}],"searchColumn":"","addresses":['.$addresses.'],"labels":[],"customAttributes":['.$custom_attr.'],"createdBy":null,"lastUpdatedBy":null,"contactCategoryIds":[],"categories":[],"isNewCustomer":"","syncToGoogle":"Y"}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=saveContact&isNewCustomer=&contactData={"title":null,"":"","firstName":"'.$contactData['firstName'].'","lastName":"'.$contactData['lastName'].'","jobTitle":"","contactTypeName":"'.$contactData['contactTypeName'].'","contactType":"'.$contactData['contactType'].'","accountName":"'.$contactData['accountName'].'","accountId":'.$contactData['accountId'].',"supplierName":"","supplierId":null,"assigneeObjectRefName":"'.$contactData['assigneeObjectRefName'].'","assigneeObjectRefId":'.$contactData['assigneeObjectRefId'].',"assigneeObjectId":8,"contactCategoryName":"","categoryId":null,"description":"","phoneNumber":"'.$contactData['phoneNumber'].'","contactEmail":"'.$contactData['contactEmail'].'","skypeName":"","languageName":null,"languageCode":null,"phoneticName":"","nickName":"","dateOfBirth":"","marketName":"","marketId":null,"segmentName":"","segmentId":null,"territoryName":"","territoryId":null,"industryName":"","industryId":null,"followUpDate":null,"followUpDescription":null,"createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","hobbies":"","foods":"","faceBookURL":"","twitterURL":"","linkedInURL":"","website":"","section_1423271450718_1343_attribute_radio_1423271792653_2867":"No","phoneNumbers":['.$phone_numbers.'],"emailAddresses":[{"emailAddress":"'.$contactData['contactEmail'].'","emailTypeCode":"BUSINESS","emailType":"Business","id":"cont_email_input"}],"searchColumn":"","addresses":['.$addresses.'],"labels":[],"customAttributes":['.$custom_attr.'],"createdBy":null,"lastUpdatedBy":null,"contactCategoryIds":[],"categories":[],"isNewCustomer":"","syncToGoogle":"Y"}&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 				
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 
@@ -707,7 +708,7 @@ class apptivo_toolset
 			$customerData['linkedInURL']
 		*/
 		 
-		$api_url = 'https://api.apptivo.com/app/dao/customers?a=createCustomer&customerData={"customerName":"'.$customerData['customerName'].'","customerNumber":"'.$customerData['customerNumber'].'","customerCategory":"'.$customerData['customerCategory'].'","customerCategoryId":'.$customerData['customerCategoryId'].',"":"","assigneeObjectRefName":"'.$customerData['assigneeObjectRefName'].'","assigneeObjectId":8,"assigneeObjectRefId":'.$customerData['assigneeObjectRefId'].',"phoneNumber":"","contactEmail":"'.$customerData['contactEmail'].'","section_1423271450718_1343_attribute_checkbox_1423272399478_5351":"N","parentCustomerName":"","parentCustomerId":null,"employeeRange":"","employeeRangeId":null,"website":"","tickerSymbol":"","annualRevenue":null,"campaignName":"","campaignId":null,"creditRating":"","marketName":"","marketId":null,"segmentName":"","segmentId":null,"industryName":"","industryId":null,"territoryName":"","territoryId":null,"paymentTerm":"'.$customerData['paymentTerm'].'","paymentTermId":"'.$customerData['paymentTermId'].'","ownership":"","slaName":"","slaId":null,"followUpDate":null,"followUpDescription":null,"description":"","createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","isExistingCustomer":"N","isAffiliate":"N","faceBookURL":"","twitterURL":"","linkedInURL":"","phoneNumbers":['.$phone_numbers.'],"emailAddresses":[{"emailAddress":"'.$customerData['contactEmail'].'","emailTypeCode":"BUSINESS","emailType":"Business","id":"cont_email_input"}],"searchColumn":"","addresses":[{"addressAttributeId":"address_section_attr_id","addressTypeCode":"1","addressType":"Billing+Address","addressLine1":"","addressLine2":"","city":"","stateCode":"","zipCode":"","countryId":176,"countryName":"United+States","deliveryInstructions":""}],"labels":[],"customAttributes":['.$custom_attr.'],"customerId":null,"createdBy":null,"lastUpdatedBy":null}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;	
+		$api_url = 'https://api.apptivo.com/app/dao/customers?a=createCustomer&customerData={"customerName":"'.$customerData['customerName'].'","customerNumber":"'.$customerData['customerNumber'].'","customerCategory":"'.$customerData['customerCategory'].'","customerCategoryId":'.$customerData['customerCategoryId'].',"":"","assigneeObjectRefName":"'.$customerData['assigneeObjectRefName'].'","assigneeObjectId":8,"assigneeObjectRefId":'.$customerData['assigneeObjectRefId'].',"phoneNumber":"","contactEmail":"'.$customerData['contactEmail'].'","section_1423271450718_1343_attribute_checkbox_1423272399478_5351":"N","parentCustomerName":"","parentCustomerId":null,"employeeRange":"","employeeRangeId":null,"website":"","tickerSymbol":"","annualRevenue":null,"campaignName":"","campaignId":null,"creditRating":"","marketName":"","marketId":null,"segmentName":"","segmentId":null,"industryName":"","industryId":null,"territoryName":"","territoryId":null,"paymentTerm":"'.$customerData['paymentTerm'].'","paymentTermId":"'.$customerData['paymentTermId'].'","ownership":"","slaName":"","slaId":null,"followUpDate":null,"followUpDescription":null,"description":"","createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","isExistingCustomer":"N","isAffiliate":"N","faceBookURL":"","twitterURL":"","linkedInURL":"","phoneNumbers":['.$phone_numbers.'],"emailAddresses":[{"emailAddress":"'.$customerData['contactEmail'].'","emailTypeCode":"BUSINESS","emailType":"Business","id":"cont_email_input"}],"searchColumn":"","addresses":[{"addressAttributeId":"address_section_attr_id","addressTypeCode":"1","addressType":"Billing+Address","addressLine1":"","addressLine2":"","city":"","stateCode":"","zipCode":"","countryId":176,"countryName":"United+States","deliveryInstructions":""}],"labels":[],"customAttributes":['.$custom_attr.'],"customerId":null,"createdBy":null,"lastUpdatedBy":null}&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;	
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);
 		
@@ -717,7 +718,7 @@ class apptivo_toolset
 // Update Methods
 	function update_contact($contactId, $attributeName, $contactData)
 	{
-		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=updateContact&objectId=2&contactId='.$contactId.'&attributeName='.$attributeName.'&contactData='.$contactData.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=updateContact&objectId=2&contactId='.$contactId.'&attributeName='.$attributeName.'&contactData='.$contactData.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);
 		
@@ -726,7 +727,7 @@ class apptivo_toolset
 	
 	function update_lead($leadId, $attributeNames, $leadData)
 	{
-		$api_url = 'https://api.apptivo.com/app/dao/leads?a=updateLead&objectId=4&leadId='.$leadId.'&attributeNames='.$attributeNames.'&leadData='.$leadData.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/leads?a=updateLead&objectId=4&leadId='.$leadId.'&attributeNames='.$attributeNames.'&leadData='.$leadData.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);
 		
@@ -734,7 +735,7 @@ class apptivo_toolset
 	}
 	
 	function update_opportunity($opportunityId, $attributeNames, $opportunityData) {
-		$api_url = 'https://api.apptivo.com/app/dao/opportunities?a=updateOpportunity&objectId=11&opportunityId='.$opportunityId.'&attributeName='.$attributeNames.'&opportunityData='.$opportunityData.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/opportunities?a=updateOpportunity&objectId=11&opportunityId='.$opportunityId.'&attributeName='.$attributeNames.'&opportunityData='.$opportunityData.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);
 		
@@ -744,7 +745,7 @@ class apptivo_toolset
 // Search Methods (later on should abstract these to be generic advanced search methods, right now search criteria is locked in)
 	function search_customers_by_name($customerName)
 	{
-		$api_url = 'https://api.apptivo.com/app/dao/customers?a=getAllCustomersByAdvancedSearch&objectId=3&startIndex=0&numRecords=250&sortColumn='.urlencode('customerName.sortable').'&sortDir=asc&searchData={"customerName":"'.$customerName.'","customerNumber":"","":"on","assigneeObjectRefName":null,"assigneeObjectId":null,"assigneeObjectRefId":null,"description":"","phoneType":"-1","phoneNumber":"","emailType":"-1","contactEmail":"","skypeName":"","parentCustomerName":"","parentCustomerId":null,"website":"","tickerSymbol":"","annualRevenue":null,"annualRevenueTo":"","campaignName":"","campaignId":null,"creditRating":"","territoryName":"","territoryId":null,"ownership":"","followUpDate":"","followUpDescription":"","createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","isExistingCustomer":"N","isAffiliate":"N","faceBookURL":"","twitterURL":"","linkedInURL":"","phoneNumbers":[{"phoneNumber":"","phoneType":"'.urlencode('Select One').'","phoneTypeCode":"-1","id":"cust_phone_input"}],"emailAddresses":[{"emailAddress":"","emailTypeCode":"-1","emailType":"","id":"cont_email_input"}],"searchColumn":"","addresses":[{"addressAttributeId":"addressAttributeId_1414492924019_8891","addressType":"","addressLine1":"","addressLine2":"","city":"","stateCode":"","state":"","zipCode":"","countryId":-1,"countryName":"'.urlencode('Select One').'","deliveryInstructions":""}],"labels":[],"customAttributes":[]}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/customers?a=getAllCustomersByAdvancedSearch&objectId=3&startIndex=0&numRecords=250&sortColumn='.urlencode('customerName.sortable').'&sortDir=asc&searchData={"customerName":"'.$customerName.'","customerNumber":"","":"on","assigneeObjectRefName":null,"assigneeObjectId":null,"assigneeObjectRefId":null,"description":"","phoneType":"-1","phoneNumber":"","emailType":"-1","contactEmail":"","skypeName":"","parentCustomerName":"","parentCustomerId":null,"website":"","tickerSymbol":"","annualRevenue":null,"annualRevenueTo":"","campaignName":"","campaignId":null,"creditRating":"","territoryName":"","territoryId":null,"ownership":"","followUpDate":"","followUpDescription":"","createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","isExistingCustomer":"N","isAffiliate":"N","faceBookURL":"","twitterURL":"","linkedInURL":"","phoneNumbers":[{"phoneNumber":"","phoneType":"'.urlencode('Select One').'","phoneTypeCode":"-1","id":"cust_phone_input"}],"emailAddresses":[{"emailAddress":"","emailTypeCode":"-1","emailType":"","id":"cont_email_input"}],"searchColumn":"","addresses":[{"addressAttributeId":"addressAttributeId_1414492924019_8891","addressType":"","addressLine1":"","addressLine2":"","city":"","stateCode":"","state":"","zipCode":"","countryId":-1,"countryName":"'.urlencode('Select One').'","deliveryInstructions":""}],"labels":[],"customAttributes":[]}&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);
 		return json_decode($api_result);
@@ -753,7 +754,7 @@ class apptivo_toolset
 	function search_leads_by_customer($customerName, $customerId)
 	{
 		$customerName = urlencode($customerName);
-		$api_url = 'https://api.apptivo.com/app/dao/leads?a=getAllLeadsByAdvancedSearch&objectId=4&startIndex=0&numRecords=250&sortColumn=_score&sortDir=desc&searchData={"title":"-1","":"","firstName":"","lastName":"","phoneType":"-1","phoneNumber":"","emailType":"-1","contactEmail":"","jobTitle":"","companyName":"","assigneeObjectRefName":null,"assigneeObjectId":null,"assigneeObjectRefId":null,"description":"","potentialAmount":null,"potentialAmountTo":"","currencyCode":"","campaignName":null,"campaignId":null,"territoryName":null,"territoryId":null,"accountName":"'.$customerName.'","accountId":'.$customerId.',"annualRevenue":null,"annualRevenueTo":"","website":"","createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","estimatedCloseDate":"","estimatedCloseEndDate":"","faceBookURL":"","twitterURL":"","linkedInURL":"","labels":[],"phoneNumbers":[{"phoneNumber":"","phoneType":"Select+One","phoneTypeCode":"-1","id":"lead_phone_input"}],"emailAddresses":[{"emailAddress":"","emailTypeCode":"-1","emailType":"","id":"cont_email_input"}],"searchColumn":"","addresses":[{"addressAttributeId":"addressAttributeId_1426668077825_5367","addressType":"","addressLine1":"","addressLine2":"","city":"","stateCode":"","state":"","zipCode":"","countryId":-1,"countryName":"Select+One"}],"customAttributes":[]}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/leads?a=getAllLeadsByAdvancedSearch&objectId=4&startIndex=0&numRecords=250&sortColumn=_score&sortDir=desc&searchData={"title":"-1","":"","firstName":"","lastName":"","phoneType":"-1","phoneNumber":"","emailType":"-1","contactEmail":"","jobTitle":"","companyName":"","assigneeObjectRefName":null,"assigneeObjectId":null,"assigneeObjectRefId":null,"description":"","potentialAmount":null,"potentialAmountTo":"","currencyCode":"","campaignName":null,"campaignId":null,"territoryName":null,"territoryId":null,"accountName":"'.$customerName.'","accountId":'.$customerId.',"annualRevenue":null,"annualRevenueTo":"","website":"","createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","estimatedCloseDate":"","estimatedCloseEndDate":"","faceBookURL":"","twitterURL":"","linkedInURL":"","labels":[],"phoneNumbers":[{"phoneNumber":"","phoneType":"Select+One","phoneTypeCode":"-1","id":"lead_phone_input"}],"emailAddresses":[{"emailAddress":"","emailTypeCode":"-1","emailType":"","id":"cont_email_input"}],"searchColumn":"","addresses":[{"addressAttributeId":"addressAttributeId_1426668077825_5367","addressType":"","addressLine1":"","addressLine2":"","city":"","stateCode":"","state":"","zipCode":"","countryId":-1,"countryName":"Select+One"}],"customAttributes":[]}&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);
 		return json_decode($api_result);
@@ -762,7 +763,7 @@ class apptivo_toolset
 	function search_opportunities_by_customer($customerName, $customerId)
 	{
 		$customerName = urlencode($customerName);
-		$api_url = 'https://api.apptivo.com/app/dao/opportunities?a=getAllOpportunitiesByAdvancedSearch&objectId=11&startIndex=0&numRecords=250&sortColumn=_score&sortDir=desc&searchData={"opportunityName":"","":"","opportunityCustomer":"'.$customerName.'","opportunityCustomerId":'.$customerId.',"probability":null,"probabilityTo":null,"opportunityContact":"","opportunityContactId":null,"closeDate":"","closeDateTo":"","nextStep":"","assignedToObjectRefName":"","amount":null,"amountTo":null,"currencyCode":null,"campaignName":"","campaignId":null,"description":"","followUpDate":"","followUpDescription":"","createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","territoryName":"","territoryId":null,"addresses":[],"customAttributes":[],"labels":[]}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/opportunities?a=getAllOpportunitiesByAdvancedSearch&objectId=11&startIndex=0&numRecords=250&sortColumn=_score&sortDir=desc&searchData={"opportunityName":"","":"","opportunityCustomer":"'.$customerName.'","opportunityCustomerId":'.$customerId.',"probability":null,"probabilityTo":null,"opportunityContact":"","opportunityContactId":null,"closeDate":"","closeDateTo":"","nextStep":"","assignedToObjectRefName":"","amount":null,"amountTo":null,"currencyCode":null,"campaignName":"","campaignId":null,"description":"","followUpDate":"","followUpDescription":"","createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","territoryName":"","territoryId":null,"addresses":[],"customAttributes":[],"labels":[]}&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);
 		return json_decode($api_result);
@@ -770,7 +771,7 @@ class apptivo_toolset
 	
 	function search_contacts_by_text($searchText) {
 		$contactEmail = urlencode($searchText);
-		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=getAllContactsBySearchText&objectId=2&startIndex=0&numRecords=250&sortColumn=_score&sortDir=desc&searchText='.$searchText.'&filterData=&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=getAllContactsBySearchText&objectId=2&startIndex=0&numRecords=250&sortColumn=_score&sortDir=desc&searchText='.$searchText.'&filterData=&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);
 
@@ -779,7 +780,7 @@ class apptivo_toolset
 	
 	function search_contacts_by_email($contactEmail) {
 		$contactEmail = urlencode($contactEmail);
-		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=getAllContactsByAdvancedSearch&objectId=2&startIndex=0&numRecords=250&sortColumn=_score&sortDir=desc&searchData={"title":null,"":"","firstName":"","lastName":"","phoneType":"-1","phoneNumber":"","emailType":"-1","contactEmail":"'.$contactEmail.'","jobTitle":"","accountName":"","accountId":null,"assigneeObjectRefName":null,"assigneeObjectId":null,"assigneeObjectRefId":null,"contactCategoryName":"","description":"","territoryName":"","territoryId":null,"createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","dateOfBirth":"","dateOfBirthTo":"","faceBookURL":"","twitterURL":"","linkedInURL":"","website":"","syncToGoogle":null,"categories":[],"phoneNumbers":[{"phoneNumber":"","phoneType":"'.urlencode('Select One').'","phoneTypeCode":"-1","id":"contact_phone_input"}],"emailAddresses":[{"emailAddress":"'.$contactEmail.'","emailTypeCode":"-1","emailType":"","id":"cont_email_input"}],"searchColumn":"","addresses":[{"addressAttributeId":"addressAttributeId_1426661106713_7286","addressType":"","addressLine1":"","addressLine2":"","city":"","stateCode":"","state":"","zipCode":"","countryId":-1,"countryName":"'.urlencode('Select One').'"}],"labels":[],"customAttributes":[]}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=getAllContactsByAdvancedSearch&objectId=2&startIndex=0&numRecords=250&sortColumn=_score&sortDir=desc&searchData={"title":null,"":"","firstName":"","lastName":"","phoneType":"-1","phoneNumber":"","emailType":"-1","contactEmail":"'.$contactEmail.'","jobTitle":"","accountName":"","accountId":null,"assigneeObjectRefName":null,"assigneeObjectId":null,"assigneeObjectRefId":null,"contactCategoryName":"","description":"","territoryName":"","territoryId":null,"createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","dateOfBirth":"","dateOfBirthTo":"","faceBookURL":"","twitterURL":"","linkedInURL":"","website":"","syncToGoogle":null,"categories":[],"phoneNumbers":[{"phoneNumber":"","phoneType":"'.urlencode('Select One').'","phoneTypeCode":"-1","id":"contact_phone_input"}],"emailAddresses":[{"emailAddress":"'.$contactEmail.'","emailTypeCode":"-1","emailType":"","id":"cont_email_input"}],"searchColumn":"","addresses":[{"addressAttributeId":"addressAttributeId_1426661106713_7286","addressType":"","addressLine1":"","addressLine2":"","city":"","stateCode":"","state":"","zipCode":"","countryId":-1,"countryName":"'.urlencode('Select One').'"}],"labels":[],"customAttributes":[]}&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);
 		return json_decode($api_result);
@@ -787,7 +788,7 @@ class apptivo_toolset
 	
 	function search_contacts_by_customer($customerName, $customerId)
 	{
-		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=getAllContactsByAdvancedSearch&objectId=2&startIndex=0&numRecords=250&sortColumn=_score&sortDir=desc&searchData={"title":null,"":"","firstName":"","lastName":"","phoneType":"-1","phoneNumber":"","emailType":"-1","contactEmail":"","jobTitle":"","accountName":"'.$customerName.'","accountId":'.$customerId.',"assigneeObjectRefName":null,"assigneeObjectId":null,"assigneeObjectRefId":null,"contactCategoryName":"","description":"","territoryName":"","territoryId":null,"createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","dateOfBirth":"","dateOfBirthTo":"","faceBookURL":"","twitterURL":"","linkedInURL":"","website":"","syncToGoogle":null,"categories":[],"phoneNumbers":[{"phoneNumber":"","phoneType":"'.urlencode('Select One').'","phoneTypeCode":"-1","id":"contact_phone_input"}],"emailAddresses":[{"emailAddress":"'.$contactEmail.'","emailTypeCode":"-1","emailType":"","id":"cont_email_input"}],"searchColumn":"","addresses":[{"addressAttributeId":"addressAttributeId_1426661106713_7286","addressType":"","addressLine1":"","addressLine2":"","city":"","stateCode":"","state":"","zipCode":"","countryId":-1,"countryName":"'.urlencode('Select One').'"}],"labels":[],"customAttributes":[]}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=getAllContactsByAdvancedSearch&objectId=2&startIndex=0&numRecords=250&sortColumn=_score&sortDir=desc&searchData={"title":null,"":"","firstName":"","lastName":"","phoneType":"-1","phoneNumber":"","emailType":"-1","contactEmail":"","jobTitle":"","accountName":"'.$customerName.'","accountId":'.$customerId.',"assigneeObjectRefName":null,"assigneeObjectId":null,"assigneeObjectRefId":null,"contactCategoryName":"","description":"","territoryName":"","territoryId":null,"createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","dateOfBirth":"","dateOfBirthTo":"","faceBookURL":"","twitterURL":"","linkedInURL":"","website":"","syncToGoogle":null,"categories":[],"phoneNumbers":[{"phoneNumber":"","phoneType":"'.urlencode('Select One').'","phoneTypeCode":"-1","id":"contact_phone_input"}],"emailAddresses":[{"emailAddress":"'.$contactEmail.'","emailTypeCode":"-1","emailType":"","id":"cont_email_input"}],"searchColumn":"","addresses":[{"addressAttributeId":"addressAttributeId_1426661106713_7286","addressType":"","addressLine1":"","addressLine2":"","city":"","stateCode":"","state":"","zipCode":"","countryId":-1,"countryName":"'.urlencode('Select One').'"}],"labels":[],"customAttributes":[]}&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);
 		return json_decode($api_result);
@@ -795,7 +796,7 @@ class apptivo_toolset
 
 	function search_contacts_by_name($firstName,$lastName)
 	{
-		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=getAllContactsByAdvancedSearch&objectId=2&startIndex=0&numRecords=250&sortColumn=_score&sortDir=desc&searchData={"title":null,"":"","firstName":"'.$firstName.'","lastName":"'.$lastName.'","phoneType":"-1","phoneNumber":"","emailType":"-1","contactEmail":"","jobTitle":"","accountName":"","accountId":null,"assigneeObjectRefName":null,"assigneeObjectId":null,"assigneeObjectRefId":null,"contactCategoryName":"","description":"","territoryName":"","territoryId":null,"createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","dateOfBirth":"","dateOfBirthTo":"","faceBookURL":"","twitterURL":"","linkedInURL":"","website":"","syncToGoogle":null,"categories":[],"phoneNumbers":[{"phoneNumber":"","phoneType":"'.urlencode('Select One').'","phoneTypeCode":"-1","id":"contact_phone_input"}],"emailAddresses":[{"emailAddress":"'.$contactEmail.'","emailTypeCode":"-1","emailType":"","id":"cont_email_input"}],"searchColumn":"","addresses":[{"addressAttributeId":"addressAttributeId_1426661106713_7286","addressType":"","addressLine1":"","addressLine2":"","city":"","stateCode":"","state":"","zipCode":"","countryId":-1,"countryName":"'.urlencode('Select One').'"}],"labels":[],"customAttributes":[]}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=getAllContactsByAdvancedSearch&objectId=2&startIndex=0&numRecords=250&sortColumn=_score&sortDir=desc&searchData={"title":null,"":"","firstName":"'.$firstName.'","lastName":"'.$lastName.'","phoneType":"-1","phoneNumber":"","emailType":"-1","contactEmail":"","jobTitle":"","accountName":"","accountId":null,"assigneeObjectRefName":null,"assigneeObjectId":null,"assigneeObjectRefId":null,"contactCategoryName":"","description":"","territoryName":"","territoryId":null,"createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","dateOfBirth":"","dateOfBirthTo":"","faceBookURL":"","twitterURL":"","linkedInURL":"","website":"","syncToGoogle":null,"categories":[],"phoneNumbers":[{"phoneNumber":"","phoneType":"'.urlencode('Select One').'","phoneTypeCode":"-1","id":"contact_phone_input"}],"emailAddresses":[{"emailAddress":"'.$contactEmail.'","emailTypeCode":"-1","emailType":"","id":"cont_email_input"}],"searchColumn":"","addresses":[{"addressAttributeId":"addressAttributeId_1426661106713_7286","addressType":"","addressLine1":"","addressLine2":"","city":"","stateCode":"","state":"","zipCode":"","countryId":-1,"countryName":"'.urlencode('Select One').'"}],"labels":[],"customAttributes":[]}&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);
 		return json_decode($api_result);
@@ -806,7 +807,7 @@ class apptivo_toolset
 	//Tasks Object
 		function get_all_tasks($sortColumn, $sortDir)
 		{
-			$api_url = 'https://api.apptivo.com/app/dao/activities?a=getAllActivities&activityType=Task&isFromApp=home&sortColumn='.$sortColumn.'&sortDir='.$sortDir.'&objectStatus=0&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+			$api_url = 'https://api.apptivo.com/app/dao/activities?a=getAllActivities&activityType=Task&isFromApp=home&sortColumn='.$sortColumn.'&sortDir='.$sortDir.'&objectStatus=0&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 			curl_setopt($this->ch, CURLOPT_URL, $api_url);
 					
 			$api_result = curl_exec($this->ch);
@@ -818,9 +819,9 @@ class apptivo_toolset
 		function update_task($attributeName, $activityId, $taskData)
 		{
 		
-			//$api_url = 'https://api.apptivo.com/app/dao/activities?a=updateTask&actType=home&activityId='.$activityId.'&attributeName=["'.$attributeName.'"]&taskData={"'.$attributeName.'":"'.$taskData.'"}&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+			//$api_url = 'https://api.apptivo.com/app/dao/activities?a=updateTask&actType=home&activityId='.$activityId.'&attributeName=["'.$attributeName.'"]&taskData={"'.$attributeName.'":"'.$taskData.'"}&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 			
-			$api_url = 'https://api.apptivo.com/app/dao/activities?a=updateTask&actType=home&activityId='.$activityId.'&attributeName=["'.$attributeName.'"]&taskData='.$taskData.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+			$api_url = 'https://api.apptivo.com/app/dao/activities?a=updateTask&actType=home&activityId='.$activityId.'&attributeName=["'.$attributeName.'"]&taskData='.$taskData.'&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 			
 			
 			curl_setopt($this->ch, CURLOPT_URL, $api_url);
@@ -832,7 +833,7 @@ class apptivo_toolset
 		
 		function get_task_priorities()
 		{
-			$api_url = 'https://api.apptivo.com/app/commonservlet?a=getLookups&app_req_type=ajax&lookupType=PRIORITY&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+			$api_url = 'https://api.apptivo.com/app/commonservlet?a=getLookups&app_req_type=ajax&lookupType=PRIORITY&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 			curl_setopt($this->ch, CURLOPT_URL, $api_url);
 			$api_result = curl_exec($this->ch);
 			$api_response = json_decode($api_result);
@@ -870,10 +871,11 @@ class apptivo_toolset
 				}
 			}
 
-			$api_url = 'https://api.apptivo.com/app/dao/activities?a=createEvent&actType=home&eventData='.json_encode($eventData).'&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+			$api_url = 'https://api.apptivo.com/app/dao/activities?a=createEvent&actType=home&eventData='.json_encode($eventData).'&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 			curl_setopt($this->ch, CURLOPT_URL, $api_url);
 			$api_result = curl_exec($this->ch);
 			$api_response = json_decode($api_result);	
+		
 			return $api_response;
 		}
 
@@ -881,7 +883,7 @@ class apptivo_toolset
 	
 	function get_countries()
 	{
-		$api_url = 'https://api.apptivo.com/app/commonservlet?a=getAllCountries&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/commonservlet?a=getAllCountries&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 
 		$api_result = curl_exec($this->ch);
@@ -892,7 +894,7 @@ class apptivo_toolset
 	
 	function get_states_by_country($input_country_id)
 	{
-		$api_url = 'https://api.apptivo.com/app/commonservlet?a=getAllStatesByCountryId&countryId='.$input_country_id.'&api_key='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/commonservlet?a=getAllStatesByCountryId&countryId='.$input_country_id.'&api_key='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 
 		$api_result = curl_exec($this->ch);
@@ -904,7 +906,7 @@ class apptivo_toolset
 	//Get settings by App.  When this is called, we'll store some required values defaults that can be overridden later.
 	function get_cases_settings()
 	{
-		$api_url = 'https://api.apptivo.com/app/dao/case?a=getCasesConfigData&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/case?a=getCasesConfigData&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 
 		$api_result = curl_exec($this->ch);
@@ -923,7 +925,7 @@ class apptivo_toolset
 
 	function get_customers_settings()
 	{
-		$api_url = 'https://api.apptivo.com/app/dao/customers?a=getAllCustomerConfigData&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/customers?a=getAllCustomerConfigData&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 
 		$api_result = curl_exec($this->ch);
@@ -938,7 +940,7 @@ class apptivo_toolset
 	
 	function get_contacts_settings()
 	{
-		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=getAllContactConfigData&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=getAllContactConfigData&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 
 		$api_result = curl_exec($this->ch);
@@ -953,7 +955,7 @@ class apptivo_toolset
 	
 	function get_leads_settings()
 	{
-		$api_url = 'https://api.apptivo.com/app/dao/leads?a=getLeadConfigData&apiKey='.$this->api_key.'&accessKey='.$this->access_key;
+		$api_url = 'https://api.apptivo.com/app/dao/leads?a=getLeadConfigData&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		
 		$api_result = curl_exec($this->ch);
@@ -1007,10 +1009,13 @@ class apptivo_toolset
 	
 //Constructor sets the api/access keypair.  Also constructs the curl object so we can start making API requests.  Will destroy curl object on destruct.
 
-	function __construct($input_apikey, $input_accesskey) {
+	function __construct($input_apikey, $input_accesskey, $user_name) {
 				
 		$this->api_key = $input_apikey;
 		$this->access_key = $input_accesskey;
+		if($user_name) {
+			$this->user_name_str = '&userName='.$user_name;
+		}
 		
 		// Basic curl implementation.  This can be further secured in future.
 		$this->ch = curl_init();
