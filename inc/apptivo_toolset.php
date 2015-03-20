@@ -846,8 +846,6 @@ class apptivo_toolset
 			if(!$eventData['sourceObjectId']){$eventData['sourceObjectId'] = '6';}
 			if(!$eventData['objectId']){$eventData['objectId'] = '6';}
 			if(!$eventData['objectRefId']){$eventData['objectRefId'] = null;}
-			if(!$eventData['subject']){$eventData['subject'] = urlencode('Lunch with Maxine');}
-			if(!$eventData['location']){$eventData['location'] = urlencode('On the border');}
 			if(!$eventData['isBillable']){$eventData['isBillable'] = 'Y';}
 			if(!$eventData['reminders']){$eventData['reminders'] = Array();}
 			if(!$eventData['isRemindMeEnabled']){$eventData['isRemindMeEnabled'] = 'N';}
@@ -860,19 +858,9 @@ class apptivo_toolset
 					)
 				);
 			}
-			if(!$eventData['associatedObjects']){
-				$eventData['associatedObjects'] = Array(
-					Array (
-						'objectId' => 2,
-						'objectRefId' => 797240,
-						'objectRefName' => urlencode('Maxine Johnson'),
-						'objectName' => 'Contact'
-					)
-				);
-			}
 			
 			// These are mandatory fields that we cannot set a default for.  You must pass in these fields, or we'll return an error message.
-			$required_fields = Array('startDate','endDate','startTimeHour','startTimeMinute','endTimeHour','endTimeMinute');
+			$required_fields = Array('subject','startDate','endDate','startTimeHour','startTimeMinute','endTimeHour','endTimeMinute');
 			foreach ($required_fields as $cur_field)
 			{
 				if(!$eventData[$cur_field])
@@ -886,7 +874,6 @@ class apptivo_toolset
 			curl_setopt($this->ch, CURLOPT_URL, $api_url);
 			$api_result = curl_exec($this->ch);
 			$api_response = json_decode($api_result);	
-		
 			return $api_response;
 		}
 
