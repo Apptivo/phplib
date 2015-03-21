@@ -6,9 +6,13 @@
 */
   
 // *****START CONFIGURATION*****
-	//Supply the API & Access keys for your Apptivo account
-	$api_key = 'kGAxOzUzGVLt-BKWXGvMyOySUNU-f88fdd0a-293f-4f55-bbcc-537e542e7993'; // Replace this with your business api key
-	$access_key = 'YTVoBw0h8Yp8B3Gw';  //Replace this with your business access key
+	include(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'conf' . DIRECTORY_SEPARATOR . 'config.php');
+	$configData = getConfig();
+
+	//Apptivo API credentials
+	$api_key = $configData['api_key'];
+	$access_key = $configData['access_key'];
+	$user_name = $configData['user_name'];
 // *****END CONFIGURATION*****
 
 // Initialize the apptivo_toolset object
