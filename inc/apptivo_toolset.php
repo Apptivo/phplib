@@ -17,6 +17,9 @@ class apptivo_toolset
 	public $casePriority;
 	public $casePriorityId;
 	
+	public $leadSourceTypeName;
+	public $leadSourceTypeId;
+	
 // Get All Methods: Read All Contacts, etc
 	function get_all_contacts($startIndex)
 	{
@@ -231,22 +234,6 @@ class apptivo_toolset
 				$opportunity_data['salesStageId'] = $this->salesStageId;
 			}
 		}
-		if(!$opportunity_data['opportunityTypeName']){
-			if($this->opportunityTypeName){
-				$opportunity_data['opportunityTypeName'] = $this->opportunityTypeName;
-			}else{
-				$this->get_opportunities_settings();
-				$opportunity_data['opportunityTypeName'] = $this->opportunityTypeName;
-			}
-		}
-		if(!$opportunity_data['opportunityTypeId']){
-			if($this->opportunityTypeId){
-				$opportunity_data['opportunityTypeId'] = $this->opportunityTypeId;
-			}else{
-				$this->get_opportunities_settings();
-				$opportunity_data['opportunityTypeId'] = $this->opportunityTypeId;
-			}
-		}
 		if(!$opportunity_data['leadSourceTypeName']){
 			if($this->leadSourceTypeName){
 				$opportunity_data['leadSourceTypeName'] = $this->leadSourceTypeName;
@@ -282,19 +269,13 @@ class apptivo_toolset
 		
 		// Some attributes need to have "null" passed in, if there is no value.  We'll check if a value was given, if not set to null.
 		if(!$opportunity_data['opportunityContactId']){$opportunity_data['opportunityContactId'] = 'null';}
+		if(!$opportunity_data['territoryId']){$opportunity_data['territoryId'] = 'null';}
 		
-		/* These are other possible values that could be passed in
-			$opportunity_data['opportunityItem']
-			$opportunity_data['needByDate']
-			$opportunity_data['opportunityProject']
-			$opportunity_data['dateResolved']
-		*/
-			
-		$api_url = 'https://api.apptivo.com/app/dao/opportunities?a=createOpportunity&opportunityData={"opportunityName":"'.$opportunity_data['opportunityName'].'","salesStageName":"'.$opportunity_data['salesStageName'].'","salesStageId":"'.$opportunity_data['salesStageId'].'","":"","opportunityCustomer":"'.$opportunity_data['opportunityCustomer'].'","opportunityCustomerId":'.$opportunity_data['opportunityCustomerId'].',"probability":"'.$opportunity_data['probability'].'","opportunityContact":"'.$opportunity_data['opportunityContact'].'","opportunityContactId":'.$opportunity_data['opportunityContactId'].',"opportunityTypeName":"'.$opportunity_data['opportunityTypeName'].'","opportunityTypeId":"'.$opportunity_data['opportunityTypeId'].'","leadSourceTypeName":"'.$opportunity_data['leadSourceTypeName'].'","leadSourceTypeId":"'.$opportunity_data['leadSourceTypeId'].'","closeDate":"'.$opportunity_data['closeDate'].'","nextStep":"","assignedToObjectRefName":"'.$opportunity_data['assignedToObjectRefName'].'","assignedToObjectId":8,"assignedToObjectRefId":'.$opportunity_data['assignedToObjectRefId'].',"amount":0,"currencyCode":"USD","campaignName":"","campaignId":null,"description":"","followUpDate":null,"followUpDescription":null,"createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","marketName":"","marketId":null,"segmentName":"","segmentId":null,"territoryName":"'.$opportunity_data['territoryName'].'","territoryId":'.$opportunity_data['territoryId'].',"section_1423271450718_1343_attribute_radio_1423271792653_2867":"No","searchColumn":"'.$opportunity_data['searchColumn'].'","addresses":[],"customAttributes":['.$custom_attr.'],"labels":[],"opportunityId":null,"createdBy":null,"lastUpdatedBy":null,"isMultiCurrency":"Y"}&fromObjectId=null&fromObjectRefId=null&isDuplicate="N"&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
+		$api_url = 'https://api.apptivo.com/app/dao/opportunities?a=createOpportunity&opportunityData={"opportunityName":"'.$opportunity_data['opportunityName'].'","salesStageName":"'.$opportunity_data['salesStageName'].'","salesStageId":"'.$opportunity_data['salesStageId'].'","":"","opportunityCustomer":"'.$opportunity_data['opportunityCustomer'].'","opportunityCustomerId":'.$opportunity_data['opportunityCustomerId'].',"opportunityContact":"'.$opportunity_data['opportunityContact'].'","opportunityContactId":'.$opportunity_data['opportunityContactId'].',"nextStep":"","territoryName":"'.$opportunity_data['territoryName'].'","territoryId":'.$opportunity_data['territoryId'].',"assignedToObjectRefName":"'.$opportunity_data['assignedToObjectRefName'].'","assignedToObjectId":8,"assignedToObjectRefId":'.$opportunity_data['assignedToObjectRefId'].',"probability":"'.$opportunity_data['probability'].'","amount":0,"currencyCode":"USD","closeDate":"'.$opportunity_data['closeDate'].'","campaignName":"","campaignId":null,"description":"","followUpDate":null,"followUpDescription":null,"marketName":"","marketId":null,"segmentName":"","segmentId":null,"leadSourceTypeName":"'.$opportunity_data['leadSourceTypeName'].'","leadSourceTypeId":"'.$opportunity_data['leadSourceTypeId'].'","opportunityTypeName":"'.$opportunity_data['opportunityTypeName'].'","opportunityTypeId":"'.$opportunity_data['opportunityTypeId'].'","createdByName":"","lastUpdatedByName":"","creationDate":"","lastUpdateDate":"","section_1423271450718_1343_attribute_radio_1423271792653_2867":"No","searchColumn":"'.$opportunity_data['searchColumn'].'","addresses":[],"customAttributes":['.$custom_attr.'],"labels":[],"opportunityId":null,"createdBy":null,"lastUpdatedBy":null,"isMultiCurrency":"Y"}&fromObjectId=null&fromObjectRefId=null&isDuplicate="N"&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);		
 		$api_response = json_decode($api_result);
-		
+
 		return $api_response;
 	}
 	
@@ -960,6 +941,21 @@ class apptivo_toolset
 		
 		$api_result = curl_exec($this->ch);
 		$api_response = json_decode($api_result);
+		
+		return $api_response;
+	}
+	
+	function get_opportunities_settings()
+	{
+		$api_url = 'https://api.apptivo.com/app/dao/opportunities?a=getAllOpportunityConfigData&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
+		curl_setopt($this->ch, CURLOPT_URL, $api_url);
+		
+		$api_result = curl_exec($this->ch);
+		$api_response = json_decode($api_result);
+
+		//Take the required fields and grab the first value to set as default		
+		$this->leadSourceTypeName = urlencode($api_response->leadSources[0]->meaning);
+		$this->leadSourceTypeId = $api_response->leadSources[0]->lookupId;
 		
 		return $api_response;
 	}

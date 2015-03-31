@@ -10,12 +10,13 @@
 */
 
 function create_g2m_mtg($subject, $starttime, $endtime, $user_id, $password, $client_id) {
+	
+	$api_url = 'https://api.citrixonline.com/oauth/access_token?grant_type=password&user_id='.$user_id.'&password='.$password.'&client_id='.$client_id;
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_HEADER, 0);
-	curl_setopt($ch, CURLOPT_URL, 'https://api.citrixonline.com/oauth/access_token?grant_type=password&user_id='.$user_id.'&password='.$password.'client_id='.$client_id);
-	
+	curl_setopt($ch, CURLOPT_URL, $api_url);
 	$api_result = curl_exec($ch);
 	$api_response = json_decode($api_result);
 
