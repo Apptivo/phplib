@@ -16,7 +16,7 @@ session_start();
 
 // Initialize the apptivo_toolset object
 include(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'apptivo_toolset.php');
-$apptivo = new apptivo_toolset($api_key, $access_key);
+$apptivo = new apptivo_toolset($api_key, $access_key, $user_name);
 
 if($_GET['action'] == 'reschedule_task')
 {	
@@ -28,28 +28,29 @@ if($_GET['action'] == 'reschedule_task')
 	$apptivo->update_task('endDate',$_GET['id'], json_encode($taskData));
 	
 	$message = 'Task Updated';
-} elseif ($_GET['action'] == 'sort')
-{		
-	if($_SESSION['sortColumn'] == $_GET['sortColumn'])
+}
+if ($_GET['action'] == 'sort') {		
+	$sortColumn = $_GET['sortColumn'];
+	$sortDir = $_GET['sortDir'];
+	if($sortColumn == 'priorityName.sortable')
 	{
-		if($_SESSION['sortDir'] == 'desc')
-		{
-			$sortDir = 'asc';
-		}else{
-			$sortDir = 'desc';
-		}
+		$sortDir = 'desc';
+	}elseif ($sortColumn == 'endDate') {
+		$sortDir = 'asc';
+	}
+}else{
+	//Default the sort to priority desc if none found
+	if(!$_SESSION['sortColumn'])
+	{
+		$sortColumn = 'priorityName.sortable';
+		$sortDir = 'desc';
 	}else{
-		$sortColumn = $_GET['sortColumn'];
-		$sortDir = $_GET['sortDir'];
+		$sortColumn = $_SESSION['sortColumn'];
+		$sortDir = $_SESSION['sortDir'];
 	}
 }
 
-//Default the sort to priority desc if none found
-if($_SESSION['sortColumn'] == '' && $sortDir == '')
-{
-	$sortColumn = 'priorityName.sortable';
-	$sortDir = 'desc';
-}
+
 
 $_SESSION['sortColumn'] = $sortColumn;
 $_SESSION['sortDir'] = $sortDir;
@@ -75,11 +76,6 @@ $task_data = $apptivo->get_all_tasks($sortColumn,$sortDir);
 //Get the priorities for this firm to render in dropdown below
 $task_priorities = $apptivo->get_task_priorities();
 
-foreach ($task_priorities as $priority)
-{
-	print_r($priority);
-	print '<br><br>';
-}
 
 
 ?>
@@ -107,7 +103,9 @@ foreach ($task_priorities as $priority)
 			{
 				//We need to calculate the reschedule defaults to pass in
 				$time_1day = date("m/d/Y",strtotime("+1 day", strtotime($ctask->endDate)));
+				$time_3day = date("m/d/Y",strtotime("+3 day", strtotime($ctask->endDate)));
 				$time_7day = date("m/d/Y",strtotime("+7 day", strtotime($ctask->endDate)));
+				$time_14day = date("m/d/Y",strtotime("+14 day", strtotime($ctask->endDate)));
 				$time_21day = date("m/d/Y",strtotime("+21 day", strtotime($ctask->endDate)));
 				
 				echo('
@@ -130,7 +128,9 @@ foreach ($task_priorities as $priority)
 							<h3>Reschedule</h3>
 							<p>
 								<a href="/task_dashboard.php?action=reschedule_task&id='.$ctask->id.'&endDate='.urlencode($time_1day).'">1 Day</a>
+								<a href="/task_dashboard.php?action=reschedule_task&id='.$ctask->id.'&endDate='.urlencode($time_3day).'">3 Days</a>
 								<a href="/task_dashboard.php?action=reschedule_task&id='.$ctask->id.'&endDate='.urlencode($time_7day).'">7 Days</a>
+								<a href="/task_dashboard.php?action=reschedule_task&id='.$ctask->id.'&endDate='.urlencode($time_14day).'">14 Days</a>
 								<a href="/task_dashboard.php?action=reschedule_task&id='.$ctask->id.'&endDate='.urlencode($time_21day).'">21 Days</a>
 							</p>
 						</div>

@@ -789,10 +789,9 @@ class apptivo_toolset
 		function get_all_tasks($sortColumn, $sortDir)
 		{
 			$api_url = 'https://api.apptivo.com/app/dao/activities?a=getAllActivities&activityType=Task&isFromApp=home&sortColumn='.$sortColumn.'&sortDir='.$sortDir.'&objectStatus=0&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
-			curl_setopt($this->ch, CURLOPT_URL, $api_url);
-					
+			curl_setopt($this->ch, CURLOPT_URL, $api_url);	
 			$api_result = curl_exec($this->ch);
-			$api_response = json_decode($api_result);
+			$api_response = json_decode($api_result);		
 		
 			return $api_response;
 		}
@@ -819,6 +818,41 @@ class apptivo_toolset
 			$api_result = curl_exec($this->ch);
 			$api_response = json_decode($api_result);
 
+			return $api_response;
+		}
+		
+		function createTask ($taskData) {		
+			if(!$taskData['activityTypeName']){$taskData['activityTypeName'] = 'Appointment';}
+			if(!$taskData['objectId']){$taskData['objectId'] = '8';}
+			if(!$taskData['objectRefId']){$taskData['objectRefId'] = null;}
+			if(!$taskData['isBillable']){$taskData['isBillable'] = 'Y';}
+			if(!$taskData['reminders']){$taskData['reminders'] = Array();}
+			if(!$taskData['isRemindMeEnabled']){$taskData['isRemindMeEnabled'] = 'N';}
+			if(!$taskData['labels']){$taskData['labels'] = Array();}
+			if(!$taskData['assigneeDetails']){
+				$taskData['assigneeDetails'] = Array(
+					Array (
+						'objectId' => 8,
+						'objectRefId' => 49462,
+					)
+				);
+			}
+			
+			// These are mandatory fields that we cannot set a default for.  You must pass in these fields, or we'll return an error message.
+			$required_fields = Array('subject','startDate','endDate','startTimeHour','startTimeMinute','endTimeHour','endTimeMinute');
+			foreach ($required_fields as $cur_field)
+			{
+				if(!$taskData[$cur_field])
+				{
+					print 'Error: '.$cur_field.' is empty.  This is a required field.  Please report this error to the website admin.<br />';
+					return 'Error: '.$cur_field.' is empty.  This is a required field.  Please report this error to the website admin.<br />';
+				}
+			}
+
+			$api_url = 'https://api.apptivo.com/app/dao/activities?a=createTask&actType=home&taskData='.json_encode($taskData).'&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
+			curl_setopt($this->ch, CURLOPT_URL, $api_url);
+			$api_result = curl_exec($this->ch);
+			$api_response = json_decode($api_result);	
 			return $api_response;
 		}
 	//Event Object
@@ -857,6 +891,37 @@ class apptivo_toolset
 			$api_result = curl_exec($this->ch);
 			$api_response = json_decode($api_result);	
 		
+			return $api_response;
+		}
+	//Follow Up Object
+		function createFollowUp($followUpData)
+		{			
+			if(!$followUpData['isRemindMeEnabled']){$followUpData['isRemindMeEnabled'] = 'N';}
+			if(!$followUpData['assigneeDetails']){
+				$followUpData['assigneeDetails'] = Array(
+					Array (
+						'objectId' => 8,
+						'objectRefId' => 49462,
+					)
+				);
+			}
+			
+			// These are mandatory fields that we cannot set a default for.  You must pass in these fields, or we'll return an error message.
+			$required_fields = Array('description','startDate','endDate');
+			foreach ($required_fields as $cur_field)
+			{
+				if(!$followUpData[$cur_field])
+				{
+					print 'Error: '.$cur_field.' is empty.  This is a required field.  Please report this error to the website admin.<br />';
+					return 'Error: '.$cur_field.' is empty.  This is a required field.  Please report this error to the website admin.<br />';
+				}
+			}
+
+			$api_url = 'https://api.apptivo.com/app/dao/activities?a=createFollowUpActivity&actType=home&followUpData='.json_encode($followUpData).'&b=1&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
+			curl_setopt($this->ch, CURLOPT_URL, $api_url);
+			$api_result = curl_exec($this->ch);
+			$api_response = json_decode($api_result);	
+
 			return $api_response;
 		}
 
