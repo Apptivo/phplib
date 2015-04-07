@@ -102,11 +102,12 @@ $task_priorities = $apptivo->get_task_priorities();
 			foreach($task_data->tasks as $ctask)
 			{
 				//We need to calculate the reschedule defaults to pass in
-				$time_1day = date("m/d/Y",strtotime("+1 day", strtotime($ctask->endDate)));
-				$time_3day = date("m/d/Y",strtotime("+3 day", strtotime($ctask->endDate)));
-				$time_7day = date("m/d/Y",strtotime("+7 day", strtotime($ctask->endDate)));
-				$time_14day = date("m/d/Y",strtotime("+14 day", strtotime($ctask->endDate)));
-				$time_21day = date("m/d/Y",strtotime("+21 day", strtotime($ctask->endDate)));
+				$time_today = date("m/d/Y");
+				$time_1day = date("m/d/Y",strtotime("+1 day"));
+				$time_3day = date("m/d/Y",strtotime("+3 day"));
+				$time_7day = date("m/d/Y",strtotime("+7 day"));
+				$time_14day = date("m/d/Y",strtotime("+14 day"));
+				$time_21day = date("m/d/Y",strtotime("+21 day"));
 				
 				echo('
 					<div class="task_cnt">
@@ -127,6 +128,7 @@ $task_priorities = $apptivo->get_task_priorities();
 						<div class="task_rgt">
 							<h3>Reschedule</h3>
 							<p>
+								<a href="/task_dashboard.php?action=reschedule_task&id='.$ctask->id.'&endDate='.urlencode($time_today).'">Today</a>
 								<a href="/task_dashboard.php?action=reschedule_task&id='.$ctask->id.'&endDate='.urlencode($time_1day).'">1 Day</a>
 								<a href="/task_dashboard.php?action=reschedule_task&id='.$ctask->id.'&endDate='.urlencode($time_3day).'">3 Days</a>
 								<a href="/task_dashboard.php?action=reschedule_task&id='.$ctask->id.'&endDate='.urlencode($time_7day).'">7 Days</a>
