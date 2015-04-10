@@ -17,6 +17,11 @@ class apptivo_toolset
 	public $casePriority;
 	public $casePriorityId;
 	
+	public $taskStatusId;
+	public $taskStatusName;
+	public $taskPriorityName;
+	public $taskPriorityId;
+	
 	public $leadSourceTypeName;
 	public $leadSourceTypeId;
 	
@@ -838,6 +843,39 @@ class apptivo_toolset
 				);
 			}
 			
+			if(!$taskData['statusId']){
+				if($this->taskStatusId){
+					$taskData['statusId'] = $this->taskStatusId;
+				}else{
+					$this->getTaskSettings();
+					$taskData['statusId'] = $this->taskStatusId;
+				}
+			}
+			if(!$taskData['statusName']){
+				if($this->taskStatusName){
+					$taskData['statusName'] = $this->taskStatusName;
+				}else{
+					$this->getTaskSettings();
+					$taskData['statusName'] = $this->taskStatusName;
+				}
+			}
+			if(!$taskData['priorityId']){
+				if($this->taskPriorityId){
+					$taskData['priorityId'] = $this->taskPriorityId;
+				}else{
+					$this->getTaskSettings();
+					$taskData['priorityId'] = $this->taskPriorityId;
+				}
+			}
+			if(!$taskData['priorityName']){
+				if($this->taskPriorityName){
+					$taskData['priorityName'] = $this->taskPriorityName;
+				}else{
+					$this->getTaskSettings();
+					$taskData['priorityName'] = $this->taskPriorityName;
+				}
+			}
+			
 			// These are mandatory fields that we cannot set a default for.  You must pass in these fields, or we'll return an error message.
 			$required_fields = Array('subject','startDate','endDate','startTimeHour','startTimeMinute','endTimeHour','endTimeMinute');
 			foreach ($required_fields as $cur_field)
@@ -848,8 +886,10 @@ class apptivo_toolset
 					return 'Error: '.$cur_field.' is empty.  This is a required field.  Please report this error to the website admin.<br />';
 				}
 			}
+			
 
 			$api_url = 'https://api.apptivo.com/app/dao/activities?a=createTask&actType=home&taskData='.json_encode($taskData).'&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
+			
 			curl_setopt($this->ch, CURLOPT_URL, $api_url);
 			$api_result = curl_exec($this->ch);
 			$api_response = json_decode($api_result);	
@@ -950,6 +990,23 @@ class apptivo_toolset
 	}
 	
 	//Get settings by App.  When this is called, we'll store some required values defaults that can be overridden later.
+	function getTaskSettings()
+	{
+		$api_url = 'https://api.apptivo.com/app/dao/activities?a=getActivityData&b=1&objectId=6&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
+		curl_setopt($this->ch, CURLOPT_URL, $api_url);
+
+		$api_result = curl_exec($this->ch);
+		$api_response = json_decode($api_result);
+		
+		//Take the required fields and grab the first value to set as default
+		$this->taskStatusName = urlencode($api_response->statuses[1]->meaning);
+		$this->taskStatusId = $api_response->statuses[1]->lookupId;
+		$this->taskPriorityName = urlencode($api_response->priorities[0]->meaning);
+		$this->taskPriorityId = $api_response->priorities[1]->lookupId;
+		
+		return $api_response;
+	}
+
 	function get_cases_settings()
 	{
 		$api_url = 'https://api.apptivo.com/app/dao/case?a=getCasesConfigData&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;

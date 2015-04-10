@@ -12,6 +12,8 @@
 	$api_key = $configData['api_key'];
 	$access_key = $configData['access_key'];
 	$user_name = $configData['user_name'];
+	$objectRefId = $configData['objectRefId'];
+	$objectRefName = $configData['objectRefName'];
 // *****END CONFIGURATION*****
 
 // Initialize the apptivo_toolset object
@@ -19,7 +21,7 @@ include(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 
 $apptivo = new apptivo_toolset($api_key, $access_key, $user_name);
 
 //How many activities should we create?
-$max_count = 5;
+$max_count = 25;
 
 //Keeping this simple & slow.  Randomly select an object, then we'll create a random type of activity for it
 for ($i = 1; $i <= $max_count; $i++) {
@@ -53,7 +55,7 @@ for ($i = 1; $i <= $max_count; $i++) {
 	
 	//Now let us pick a random activity type (event, task, follow up) and create it.  2 Random numbers so we can randomize content for activities.
 	$rActivityType = rand(6,6);
-	$rMessage = rand(1,1);
+	$rMessage = rand(1,6);
 	$rDate = rand(1,5);
 
 	switch($rActivityType) {
@@ -137,7 +139,8 @@ for ($i = 1; $i <= $max_count; $i++) {
 				'assigneeDetails' => Array (
 					Array (
 						'objectId' => 8,
-						'objectRefId' => 18767,
+						'objectRefId' => $objectRefId,
+						'objectRefName' => $objectRefName,
 					)
 				),
 				'associatedObjects' => Array (
@@ -224,9 +227,9 @@ for ($i = 1; $i <= $max_count; $i++) {
 				'assigneeDetails' => Array (
 					Array (
 						'objectId' => 8,
-						'objectRefId' => 18767,
+						'objectRefId' => $objectRefId,
 						'objectName' => 'Employee',
-						'objectRefName' => urlencode('Kenny Clark')
+						'objectRefName' => urlencode($objectRefName)
 					)
 				),
 				'associatedObjects' => Array (
@@ -257,10 +260,31 @@ for ($i = 1; $i <= $max_count; $i++) {
 					$subject = 'Research new Angular.js admin template';
 					$description = 'Found it on the main templates area, give it a shot';
 				break;
+				Case 2:
+					$subject = 'Research details on project for'.urldecode($associated_object['objectRefName']);
+					$description = 'Medium priority, get it done this week';
+				break;
+				Case 3:
+					$subject = 'Write up sales proposal for'.urldecode($associated_object['objectRefName']);
+					$description = 'They are hoping to have it in their ends before end of week';
+				break;
+				Case 4:
+					$subject = 'Re-evaluate current sales process';
+					$description = 'Need to ensure our lead & opportunity stages are still efficient.';
+				break;
+				Case 5:
+					$subject = 'Send '.urldecode($associated_object['objectRefName']).' post-mortem report';
+					$description = 'Mostly already completed, file is located in Drive, just update and export as PDF';
+				break;
+				Case 6:
+					$subject = 'Fix all P1 bugs created from'.urldecode($associated_object['objectRefName']);
+					$description = 'Ignore the lower priority items for right now, just focus on the key issues';
+				break;
 			}
 
-			$startTime = date("m/d/Y",strtotime('+'.$rDate.' days')).' 12:00';
+			$startTime = date("m/d/Y",strtotime('-1 days')).' 12:00';
 			$endTime = date("m/d/Y",strtotime('+'.$rDate.' days')).' 14:30';
+
 			$start_arr = explode(' ',$startTime);
 			$start_time_arr = explode(':',$start_arr[1]);
 			$end_arr = explode(' ',$endTime);
@@ -295,23 +319,15 @@ for ($i = 1; $i <= $max_count; $i++) {
 			$taskData = Array (
 				'subject' => urlencode($subject),
 				'description' => urlencode($description),
-				'statusId' => 6826835,
-				'statusCode' => "1",
-				'statusName' => urlencode('Not Started'),
-				'priorityId' => 6826751,
-				'priorityCode' => "2",
-				'priorityName' => urlencode('P2 - Medium'),
-				'categoryId' => 10014,
-				'categoryName' => urlencode('quick task'),
 				'objectId' => 8,
 				'activityType' => 'Task',
 				'documentIds' => Array(),
 				'assigneeDetails' => Array (
 					Array (
 						'objectId' => 8,
-						'objectRefId' => 18767,
+						'objectRefId' => $objectRefId,
 						'objectName' => 'Employee',
-						'objectRefName' => urlencode('Kenny Clark')
+						'objectRefName' => urlencode($objectRefName)
 					)
 				),
 				'associatedObjects' => Array (
@@ -331,13 +347,16 @@ for ($i = 1; $i <= $max_count; $i++) {
 				'isRemindMeEnabled' => 'N',
 				'labels' => Array(),
 				'tags' => Array()
-			);
+			);		
+
 			$createdTask = $apptivo->createTask($taskData);
 			if($createdTask) {
 				print 'Just successfully created a task<br>';
 			}else{
 				print 'Just FAILED to created a task<br>';
 			}
+			
+
 		break;
 	}
 	
