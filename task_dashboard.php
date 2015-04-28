@@ -5,7 +5,7 @@ session_start();
 */
   
 // *****START CONFIGURATION*****
-	include(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'conf' . DIRECTORY_SEPARATOR . 'config.php');
+	include(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'conf' . DIRECTORY_SEPARATOR . 'apptivo.config.php');
 	$configData = getConfig();
 
 	//Apptivo API credentials

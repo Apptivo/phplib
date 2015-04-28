@@ -5,7 +5,7 @@
 */
 
 // *****START CONFIGURATION*****
-	include(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'conf' . DIRECTORY_SEPARATOR . 'config.php');
+	include(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'conf' . DIRECTORY_SEPARATOR . 'newglocial.config.php');
 	$configData = getConfig();
 
 	//Apptivo API credentials
@@ -21,7 +21,7 @@ include(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 
 $apptivo = new apptivo_toolset($api_key, $access_key, $user_name);
 
 //How many activities should we create?
-$max_count = 25;
+$max_count = 35;
 
 //Keeping this simple & slow.  Randomly select an object, then we'll create a random type of activity for it
 for ($i = 1; $i <= $max_count; $i++) {
@@ -54,7 +54,7 @@ for ($i = 1; $i <= $max_count; $i++) {
 	} while (!$associated_object);
 	
 	//Now let us pick a random activity type (event, task, follow up) and create it.  2 Random numbers so we can randomize content for activities.
-	$rActivityType = rand(6,6);
+	$rActivityType = rand(1,9);
 	$rMessage = rand(1,6);
 	$rDate = rand(1,5);
 
@@ -62,6 +62,8 @@ for ($i = 1; $i <= $max_count; $i++) {
 		Case 1:
 		Case 2:
 		Case 3:
+		Case 4:
+		Case 5:
 			//Event
 			switch($rMessage) {
 				Case 1:
@@ -140,7 +142,7 @@ for ($i = 1; $i <= $max_count; $i++) {
 					Array (
 						'objectId' => 8,
 						'objectRefId' => $objectRefId,
-						'objectRefName' => $objectRefName,
+						'objectRefName' => urlencode($objectRefName),
 					)
 				),
 				'associatedObjects' => Array (
@@ -163,8 +165,9 @@ for ($i = 1; $i <= $max_count; $i++) {
 				print 'Just FAILED to created an event<br>';
 			}
 		break;
-		Case 4:
-		Case 5:
+		Case 6:
+		Case 7:
+		Case 8:
 			//Follow Up
 			switch($rMessage) {
 				Case 1:
@@ -253,7 +256,7 @@ for ($i = 1; $i <= $max_count; $i++) {
 				print 'Just FAILED to created a follow up<br>';
 			}
 		break;
-		Case 6:
+		Case 9:
 			//Tasks
 			switch($rMessage) {
 				Case 1:
