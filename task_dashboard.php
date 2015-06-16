@@ -20,7 +20,10 @@ $apptivo = new apptivo_toolset($api_key, $access_key, $user_name);
 
 if($_GET['action'] == 'reschedule_task')
 {	
+
+
 	$taskData = Array (
+		'startDate'=> $_GET['endDate'],
 		'endDate'=> $_GET['endDate']
 	);
 
@@ -136,6 +139,7 @@ $task_priorities = $apptivo->get_task_priorities();
 								<a href="/task_dashboard.php?action=reschedule_task&id='.$ctask->id.'&endDate='.urlencode($time_21day).'">21 Days</a>
 							</p>
 						</div>
+						<div style="clear:both"></div>
 					</div>
 				');
 			}

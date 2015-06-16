@@ -280,6 +280,9 @@ class apptivo_toolset
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);		
 		$api_response = json_decode($api_result);
+		
+		print $api_url;
+		print '<br><br>';
 
 		return $api_response;
 	}
@@ -760,7 +763,7 @@ class apptivo_toolset
 		$api_url = 'https://api.apptivo.com/app/dao/contacts?a=getAllContactsBySearchText&objectId=2&startIndex=0&numRecords=250&sortColumn=_score&sortDir=desc&searchText='.$searchText.'&filterData=&apiKey='.$this->api_key.'&accessKey='.$this->access_key.$this->user_name_str;
 		curl_setopt($this->ch, CURLOPT_URL, $api_url);
 		$api_result = curl_exec($this->ch);
-
+		
 		return json_decode($api_result);
 	}
 	
@@ -930,7 +933,7 @@ class apptivo_toolset
 			curl_setopt($this->ch, CURLOPT_URL, $api_url);
 			$api_result = curl_exec($this->ch);
 			$api_response = json_decode($api_result);	
-		
+			
 			return $api_response;
 		}
 	//Follow Up Object
